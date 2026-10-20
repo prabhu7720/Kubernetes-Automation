@@ -1,0 +1,64 @@
+# Splunk Automation Agent - main configuration.
+# Values support ${ENV_VAR} and ${ENV_VAR:-default}. Never commit secrets: use
+# SPLUNK_TOKEN (preferred) or SPLUNK_USERNAME / SPLUNK_PASSWORD environment variables.
+
+splunk:
+  host: ${SPLUNK_HOST:-localhost}
+  port: 8089
+  scheme: https
+  app: search
+  owner: nobody
+  verify_ssl: true
+  ca_bundle: ${SPLUNK_CA_BUNDLE:-}
+  timeout: 60
+  retries: 3
+  retry_delay: 2.0
+
+discovery:
+  lookback: -7d                 # time window used for tstats/metadata discovery
+  field_sample_size: 500        # events sampled per dataset for fieldsummary
+  max_datasets_for_fields: 100  # cap on (index, sourcetype) pairs profiled
+  include_internal_indexes: false
+  max_hosts: 5000
+  max_sources: 2000
+  max_workers: 4                # parallel field-profiling searches
+  collectors: []                # empty = all collectors
+
+catalog:
+  path: catalog/metadata.db     # SQLite catalog (relative to project root)
+
+plugins:
+  rule_dirs: []                 # extra directories with *.py / *.yaml rule packs
+  generator_dirs: []
+  collector_dirs: []
+  strict: false                 # true = fail fast on any plugin error (recommended in CI)
+
+generation:
+  name_prefix: "AUTO - "
+  default_earliest: -24h
+  min_match_score: 1.5
+  max_dashboard_panels: 16
+  dashboard_theme: dark
+  include_accelerated: true     # emit tstats variants when the CIM data model is accelerated
+  strict_lint: false            # true = fail generation on SPL lint errors
+  alert_email_to: ${SPLUNK_AGENT_ALERT_EMAIL:-}
+  alert_webhook_url: ${SPLUNK_AGENT_ALERT_WEBHOOK:-}
+
+publish:
+  enabled: false                # must be true for --deploy to write to Splunk
+  app: search
+  owner: nobody
+  sharing: app
+  overwrite: false
+
+logging:
+  level: INFO
+  file: logs/splunk-agent.log
+  json: false
+
+# Per-use-case tuning without touching code (params, thresholds, keywords ...)
+use_case_overrides:
+  pci_failed_access:
+    params: {cde_scope: ""}
+  # brute_force:
+  #   alert: {threshold: 30, severity: critical}

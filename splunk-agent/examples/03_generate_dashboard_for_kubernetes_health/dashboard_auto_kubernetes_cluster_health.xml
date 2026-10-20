@@ -1,0 +1,567 @@
+<dashboard version="2" theme="dark">
+    <label>Kubernetes Cluster Health</label>
+    <description>Workload stability, scheduling, node conditions and resource usage.</description>
+    <definition><![CDATA[
+{
+  "title": "Kubernetes Cluster Health",
+  "description": "Workload stability, scheduling, node conditions and resource usage.",
+  "inputs": {
+    "input_global_trp": {
+      "type": "input.timerange",
+      "title": "Time Range",
+      "options": {
+        "token": "global_time",
+        "defaultValue": "-24h@h,now"
+      }
+    },
+    "input_namespace": {
+      "type": "input.text",
+      "title": "Namespace",
+      "options": {
+        "token": "namespace",
+        "defaultValue": "*"
+      }
+    }
+  },
+  "defaults": {
+    "dataSources": {
+      "ds.search": {
+        "options": {
+          "queryParameters": {
+            "earliest": "$global_time.earliest$",
+            "latest": "$global_time.latest$"
+          }
+        }
+      }
+    }
+  },
+  "visualizations": {
+    "viz_warning_events": {
+      "type": "splunk.singlevalue",
+      "title": "Warning Events",
+      "description": "Warning events per namespace with affected objects and reasons.",
+      "dataSources": {
+        "primary": "ds_warning_events"
+      },
+      "options": {
+        "majorValueSize": 36,
+        "trendDisplay": "off",
+        "sparklineDisplay": "off"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_crashlooping_pods": {
+      "type": "splunk.singlevalue",
+      "title": "CrashLooping Pods",
+      "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+      "dataSources": {
+        "primary": "ds_crashlooping_pods"
+      },
+      "options": {
+        "majorValueSize": 36,
+        "trendDisplay": "off",
+        "sparklineDisplay": "off"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_oomkilled_events": {
+      "type": "splunk.singlevalue",
+      "title": "OOMKilled Events",
+      "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+      "dataSources": {
+        "primary": "ds_oomkilled_events"
+      },
+      "options": {
+        "majorValueSize": 36,
+        "trendDisplay": "off",
+        "sparklineDisplay": "off"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_unschedulable_pods": {
+      "type": "splunk.singlevalue",
+      "title": "Unschedulable Pods",
+      "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+      "dataSources": {
+        "primary": "ds_unschedulable_pods"
+      },
+      "options": {
+        "majorValueSize": 36,
+        "trendDisplay": "off",
+        "sparklineDisplay": "off"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_warning_events_by_namespace": {
+      "type": "splunk.line",
+      "title": "Warning Events by Namespace",
+      "description": "Warning events over time per namespace.",
+      "dataSources": {
+        "primary": "ds_warning_events_by_namespace"
+      },
+      "options": {
+        "legendDisplay": "right",
+        "nullValueDisplay": "zero"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_restart_signals_by_pod": {
+      "type": "splunk.line",
+      "title": "Restart Signals by Pod",
+      "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+      "dataSources": {
+        "primary": "ds_restart_signals_by_pod"
+      },
+      "options": {
+        "legendDisplay": "right",
+        "nullValueDisplay": "zero"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_cpu_by_pod": {
+      "type": "splunk.line",
+      "title": "CPU by Pod",
+      "description": "CPU utilisation per pod from OpenTelemetry/kubelet metrics.",
+      "dataSources": {
+        "primary": "ds_cpu_by_pod"
+      },
+      "options": {
+        "legendDisplay": "right",
+        "nullValueDisplay": "zero"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_memory_of_limit_by_pod": {
+      "type": "splunk.line",
+      "title": "Memory % of Limit by Pod",
+      "description": "Memory working set as a percentage of the container limit, per pod.",
+      "dataSources": {
+        "primary": "ds_memory_of_limit_by_pod"
+      },
+      "options": {
+        "legendDisplay": "right",
+        "nullValueDisplay": "zero"
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_crashloopbackoff_details": {
+      "type": "splunk.table",
+      "title": "CrashLoopBackOff Details",
+      "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+      "dataSources": {
+        "primary": "ds_crashloopbackoff_details"
+      },
+      "options": {
+        "count": 10
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_top_pods_by_restarts": {
+      "type": "splunk.table",
+      "title": "Top Pods by Restarts",
+      "description": "Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+      "dataSources": {
+        "primary": "ds_top_pods_by_restarts"
+      },
+      "options": {
+        "count": 10
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_node_conditions": {
+      "type": "splunk.table",
+      "title": "Node Conditions",
+      "description": "NotReady, pressure conditions, reboots and kubelet problems per node.",
+      "dataSources": {
+        "primary": "ds_node_conditions"
+      },
+      "options": {
+        "count": 10
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_deployment_failures": {
+      "type": "splunk.table",
+      "title": "Deployment Failures",
+      "description": "Failed rollouts and controller errors for Deployments/ReplicaSets/StatefulSets/DaemonSets.",
+      "dataSources": {
+        "primary": "ds_deployment_failures"
+      },
+      "options": {
+        "count": 10
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    },
+    "viz_scheduling_failures": {
+      "type": "splunk.table",
+      "title": "Scheduling Failures",
+      "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+      "dataSources": {
+        "primary": "ds_scheduling_failures"
+      },
+      "options": {
+        "count": 10
+      },
+      "eventHandlers": [
+        {
+          "type": "drilldown.linkToSearch",
+          "options": {
+            "type": "auto",
+            "newTab": true
+          }
+        }
+      ]
+    }
+  },
+  "dataSources": {
+    "ds_warning_events": {
+      "type": "ds.search",
+      "name": "Warning Events",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings",
+        "enableSmartSources": true
+      }
+    },
+    "ds_crashlooping_pods": {
+      "type": "ds.search",
+      "name": "CrashLooping Pods",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods",
+        "enableSmartSources": true
+      }
+    },
+    "ds_oomkilled_events": {
+      "type": "ds.search",
+      "name": "OOMKilled Events",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills",
+        "enableSmartSources": true
+      }
+    },
+    "ds_unschedulable_pods": {
+      "type": "ds.search",
+      "name": "Unschedulable Pods",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods",
+        "enableSmartSources": true
+      }
+    },
+    "ds_warning_events_by_namespace": {
+      "type": "ds.search",
+      "name": "Warning Events by Namespace",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+        "enableSmartSources": true
+      }
+    },
+    "ds_restart_signals_by_pod": {
+      "type": "ds.search",
+      "name": "Restart Signals by Pod",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+        "enableSmartSources": true
+      }
+    },
+    "ds_cpu_by_pod": {
+      "type": "ds.search",
+      "name": "CPU by Pod",
+      "options": {
+        "query": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true",
+        "enableSmartSources": true
+      }
+    },
+    "ds_memory_of_limit_by_pod": {
+      "type": "ds.search",
+      "name": "Memory % of Limit by Pod",
+      "options": {
+        "query": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true",
+        "enableSmartSources": true
+      }
+    },
+    "ds_crashloopbackoff_details": {
+      "type": "ds.search",
+      "name": "CrashLoopBackOff Details",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)",
+        "enableSmartSources": true
+      }
+    },
+    "ds_top_pods_by_restarts": {
+      "type": "ds.search",
+      "name": "Top Pods by Restarts",
+      "options": {
+        "query": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10",
+        "enableSmartSources": true
+      }
+    },
+    "ds_node_conditions": {
+      "type": "ds.search",
+      "name": "Node Conditions",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)",
+        "enableSmartSources": true
+      }
+    },
+    "ds_deployment_failures": {
+      "type": "ds.search",
+      "name": "Deployment Failures",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)",
+        "enableSmartSources": true
+      }
+    },
+    "ds_scheduling_failures": {
+      "type": "ds.search",
+      "name": "Scheduling Failures",
+      "options": {
+        "query": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts",
+        "enableSmartSources": true
+      }
+    }
+  },
+  "layout": {
+    "type": "absolute",
+    "options": {
+      "width": 1440,
+      "height": 2640,
+      "display": "auto-scale"
+    },
+    "structure": [
+      {
+        "item": "viz_warning_events",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 0,
+          "w": 350,
+          "h": 120
+        }
+      },
+      {
+        "item": "viz_crashlooping_pods",
+        "type": "block",
+        "position": {
+          "x": 360,
+          "y": 0,
+          "w": 350,
+          "h": 120
+        }
+      },
+      {
+        "item": "viz_oomkilled_events",
+        "type": "block",
+        "position": {
+          "x": 720,
+          "y": 0,
+          "w": 350,
+          "h": 120
+        }
+      },
+      {
+        "item": "viz_unschedulable_pods",
+        "type": "block",
+        "position": {
+          "x": 1080,
+          "y": 0,
+          "w": 360,
+          "h": 120
+        }
+      },
+      {
+        "item": "viz_warning_events_by_namespace",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 130,
+          "w": 710,
+          "h": 320
+        }
+      },
+      {
+        "item": "viz_restart_signals_by_pod",
+        "type": "block",
+        "position": {
+          "x": 720,
+          "y": 130,
+          "w": 720,
+          "h": 320
+        }
+      },
+      {
+        "item": "viz_cpu_by_pod",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 460,
+          "w": 710,
+          "h": 320
+        }
+      },
+      {
+        "item": "viz_memory_of_limit_by_pod",
+        "type": "block",
+        "position": {
+          "x": 720,
+          "y": 460,
+          "w": 720,
+          "h": 320
+        }
+      },
+      {
+        "item": "viz_crashloopbackoff_details",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 790,
+          "w": 1440,
+          "h": 360
+        }
+      },
+      {
+        "item": "viz_top_pods_by_restarts",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 1160,
+          "w": 1440,
+          "h": 360
+        }
+      },
+      {
+        "item": "viz_node_conditions",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 1530,
+          "w": 1440,
+          "h": 360
+        }
+      },
+      {
+        "item": "viz_deployment_failures",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 1900,
+          "w": 1440,
+          "h": 360
+        }
+      },
+      {
+        "item": "viz_scheduling_failures",
+        "type": "block",
+        "position": {
+          "x": 0,
+          "y": 2270,
+          "w": 1440,
+          "h": 360
+        }
+      }
+    ],
+    "globalInputs": [
+      "input_global_trp",
+      "input_namespace"
+    ]
+  }
+}
+]]></definition>
+    <meta type="hiddenElements"><![CDATA[
+{"hideEdit": false, "hideOpenInSearch": false, "hideExport": false}
+]]></meta>
+</dashboard>

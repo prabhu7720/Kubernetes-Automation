@@ -1,0 +1,1798 @@
+{
+  "request": "Generate dashboard for Kubernetes health",
+  "title": "Kubernetes Cluster Health",
+  "artifact_type": "dashboard",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Generate dashboard for Kubernetes health",
+    "artifact_type": "dashboard",
+    "tokens": [
+      "kubernetes",
+      "health"
+    ],
+    "time_range": null,
+    "threshold": null,
+    "comparator": null,
+    "percent": false,
+    "window": null,
+    "status_codes": [],
+    "limit": null,
+    "groupby": null,
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "namespace_health",
+    "crashloopbackoff",
+    "oomkilled",
+    "failed_scheduling",
+    "k8s_warning_trend",
+    "pod_restarts",
+    "container_cpu_usage",
+    "memory_utilization",
+    "top_pods_restart_count",
+    "node_issues",
+    "deployment_failures"
+  ],
+  "alternatives": [],
+  "generated_spl": [
+    {
+      "use_case": "k8s_warning_trend",
+      "title": "Kubernetes Warning Event Trend",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.type=\"Warning\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "15m",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "namespace": "object.involvedObject.namespace",
+          "type": "object.type"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Kubernetes Warning Event Trend': Warning events over time per namespace.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: namespace->object.involvedObject.namespace, type->object.type.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.type=\"Warning\".",
+        "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.namespace."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "namespace_health",
+      "title": "Namespace Health (Warning Events)",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "namespace": "object.involvedObject.namespace",
+          "object_name": "object.involvedObject.name",
+          "reason": "object.reason",
+          "type": "object.type"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Namespace Health (Warning Events)': Warning events per namespace with affected objects and reasons.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: namespace->object.involvedObject.namespace, object_name->object.involvedObject.name, reason->object.reason, type->object.type.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "crashloopbackoff",
+      "title": "CrashLoopBackOff Pods",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'CrashLoopBackOff Pods': Pods in CrashLoopBackOff (back-off restarting failed container).",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes dc(object.involvedObject.name) as crashlooping_pods across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "oomkilled",
+      "title": "OOMKilled Containers",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'OOMKilled Containers': Containers killed for exceeding memory limits and node-level OOM kills.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "failed_scheduling",
+      "title": "Failed Scheduling / Pending Pods",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Failed Scheduling / Pending Pods': Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes dc(object.involvedObject.name) as pending_pods across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "k8s_warning_trend",
+      "title": "Kubernetes Warning Event Trend",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "15m",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "namespace": "object.involvedObject.namespace",
+          "type": "object.type"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Kubernetes Warning Event Trend': Warning events over time per namespace.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: namespace->object.involvedObject.namespace, type->object.type.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\".",
+        "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.namespace."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pod_restarts",
+      "title": "Pod Restart Spikes",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "15m",
+      "limit": 10,
+      "groupby": "pod",
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "object_kind": "object.involvedObject.kind",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Pod Restart Spikes': Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, object_kind->object.involvedObject.kind, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\".",
+        "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.name."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "container_cpu_usage",
+      "title": "Container CPU Usage",
+      "spl": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true",
+      "adhoc_spl": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" earliest=-24h latest=now span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "5m",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_metrics",
+        "datasets": [
+          {
+            "index": "k8s_metrics",
+            "sourcetype": null
+          }
+        ],
+        "base": "index=k8s_metrics",
+        "field_map": {
+          "namespace": "k8s.namespace.name",
+          "pod": "k8s.pod.name"
+        },
+        "metric_map": {
+          "cpu": "container.cpu.utilization"
+        },
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Container CPU Usage': CPU utilisation per pod from OpenTelemetry/kubelet metrics.",
+        "Datasource 'kubernetes_metrics' resolved to index=k8s_metrics (selected from the discovered catalog, confidence 100%). Field mapping: namespace->k8s.namespace.name, pod->k8s.pod.name.",
+        "`mstats` queries the metrics store computing avg(container.cpu.utilization) as cpu by k8s.namespace.name k8s.pod.name.",
+        "`timechart` buckets results over time (span 5m) computing max(cpu) as cpu, one series per k8s.pod.name."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "memory_utilization",
+      "title": "Pod Memory Utilization",
+      "spl": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true",
+      "adhoc_spl": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" earliest=-24h latest=now span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "5m",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_metrics",
+        "datasets": [
+          {
+            "index": "k8s_metrics",
+            "sourcetype": null
+          }
+        ],
+        "base": "index=k8s_metrics",
+        "field_map": {
+          "namespace": "k8s.namespace.name",
+          "pod": "k8s.pod.name"
+        },
+        "metric_map": {
+          "memory": "container.memory.usage",
+          "memory_limit": "k8s.container.memory_limit"
+        },
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Pod Memory Utilization': Memory working set as a percentage of the container limit, per pod.",
+        "Datasource 'kubernetes_metrics' resolved to index=k8s_metrics (selected from the discovered catalog, confidence 100%). Field mapping: namespace->k8s.namespace.name, pod->k8s.pod.name.",
+        "`mstats` queries the metrics store computing avg(container.memory.usage) as mem_bytes, max(k8s.container.memory_limit) as mem_limit by k8s.namespace.name k8s.pod.name.",
+        "`eval` derives fields: mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null()).",
+        "`timechart` buckets results over time (span 5m) computing max(mem_pct) as mem_pct, one series per k8s.pod.name."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "crashloopbackoff",
+      "title": "CrashLoopBackOff Pods",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'CrashLoopBackOff Pods': Pods in CrashLoopBackOff (back-off restarting failed container).",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes count, latest(object.message) as last_message, latest(_time) as last_seen grouped by object.involvedObject.namespace object.involvedObject.name.",
+        "`sort` orders results by descending backoffs.",
+        "`convert` formats ctime(last_seen) as human-readable time."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "top_pods_restart_count",
+      "title": "Top Pods by Restart Count",
+      "spl": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10",
+      "adhoc_spl": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" earliest=-24h latest=now span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "5m",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_metrics",
+        "datasets": [
+          {
+            "index": "k8s_metrics",
+            "sourcetype": null
+          }
+        ],
+        "base": "index=k8s_metrics",
+        "field_map": {
+          "namespace": "k8s.namespace.name",
+          "pod": "k8s.pod.name"
+        },
+        "metric_map": {
+          "restarts": "k8s.container.restarts"
+        },
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Top Pods by Restart Count': Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+        "Datasource 'kubernetes_metrics' resolved to index=k8s_metrics (selected from the discovered catalog, confidence 100%). Field mapping: namespace->k8s.namespace.name, pod->k8s.pod.name.",
+        "`mstats` queries the metrics store computing max(k8s.container.restarts) as restarts by k8s.namespace.name k8s.pod.name.",
+        "`stats` computes range(restarts) as restarts_in_window, max(restarts) as total_restarts grouped by k8s.namespace.name k8s.pod.name.",
+        "`where` keeps only rows where restarts_in_window > 0.",
+        "`sort` orders results by descending restarts_in_window.",
+        "`head` keeps the first 10 rows."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "node_issues",
+      "title": "Node Issues",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "object_kind": "object.involvedObject.kind",
+          "object_name": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Node Issues': NotReady, pressure conditions, reboots and kubelet problems per node.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, object_kind->object.involvedObject.kind, object_name->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\").",
+        "`stats` computes count, values(object.reason) as conditions, latest(object.message) as last_message, latest(_time) as last_seen grouped by object.involvedObject.name.",
+        "`rename` renames object.involvedObject.name AS node.",
+        "`sort` orders results by descending events.",
+        "`convert` formats ctime(last_seen) as human-readable time."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "deployment_failures",
+      "title": "Deployment Failures",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "object_kind": "object.involvedObject.kind",
+          "object_name": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Deployment Failures': Failed rollouts and controller errors for Deployments/ReplicaSets/StatefulSets/DaemonSets.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, object_kind->object.involvedObject.kind, object_name->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\".",
+        "`stats` computes count, values(object.reason) as reasons, latest(object.message) as last_message, latest(_time) as last_seen grouped by object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name.",
+        "`sort` orders results by descending failures.",
+        "`convert` formats ctime(last_seen) as human-readable time."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "failed_scheduling",
+      "title": "Failed Scheduling / Pending Pods",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Failed Scheduling / Pending Pods': Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\".",
+        "`rex` extracts new fields with a regular expression.",
+        "`stats` computes count, values(scheduling_reason) as reasons, latest(object.message) as last_message grouped by object.involvedObject.namespace object.involvedObject.name.",
+        "`sort` orders results by descending attempts."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Dashboard blueprint 'kubernetes_health' selected with 13 panels; panels share a global time picker.",
+    "Use case 'Kubernetes Warning Event Trend': Warning events over time per namespace.",
+    "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: namespace->object.involvedObject.namespace, type->object.type.",
+    "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.type=\"Warning\".",
+    "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.namespace."
+  ],
+  "visualization": {
+    "primary": "line",
+    "studio_type": "splunk.line",
+    "rationale": "Time-bucketed series are best read as a trend line.",
+    "alternatives": [
+      "area",
+      "column"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "Warning Events",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "namespace_health",
+      "description": "Warning events per namespace with affected objects and reasons.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings"
+    },
+    {
+      "title": "CrashLooping Pods",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "crashloopbackoff",
+      "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods"
+    },
+    {
+      "title": "OOMKilled Events",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "oomkilled",
+      "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills"
+    },
+    {
+      "title": "Unschedulable Pods",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "failed_scheduling",
+      "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods"
+    },
+    {
+      "title": "Warning Events by Namespace",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "k8s_warning_trend",
+      "description": "Warning events over time per namespace.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true"
+    },
+    {
+      "title": "Restart Signals by Pod",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "pod_restarts",
+      "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true"
+    },
+    {
+      "title": "CPU by Pod",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "container_cpu_usage",
+      "description": "CPU utilisation per pod from OpenTelemetry/kubelet metrics.",
+      "drilldown": "linkToSearch",
+      "spl": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true"
+    },
+    {
+      "title": "Memory % of Limit by Pod",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "memory_utilization",
+      "description": "Memory working set as a percentage of the container limit, per pod.",
+      "drilldown": "linkToSearch",
+      "spl": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true"
+    },
+    {
+      "title": "CrashLoopBackOff Details",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "crashloopbackoff",
+      "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "Top Pods by Restarts",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "top_pods_restart_count",
+      "description": "Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+      "drilldown": "linkToSearch",
+      "spl": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10"
+    },
+    {
+      "title": "Node Conditions",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "node_issues",
+      "description": "NotReady, pressure conditions, reboots and kubelet problems per node.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "Deployment Failures",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "deployment_failures",
+      "description": "Failed rollouts and controller errors for Deployments/ReplicaSets/StatefulSets/DaemonSets.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "Scheduling Failures",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "failed_scheduling",
+      "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - Kubernetes Warning Event Trend",
+      "title": "Kubernetes Warning Event Trend",
+      "description": "Warning events over time per namespace.",
+      "business_description": "Kubernetes Warning Event Trend tracks platform reliability so SRE teams can act before users are affected: Warning events over time per namespace.",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+      "schedule": {
+        "cron": "0 6 * * *",
+        "human": "daily at 06:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "line",
+      "saved_search_params": {
+        "search": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+        "description": "Warning events over time per namespace.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "visualizations",
+        "display.page.search.tab": "visualizations",
+        "display.visualizations.type": "charting",
+        "display.visualizations.charting.chart": "line",
+        "cron_schedule": "0 6 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": false,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - Namespace Health (Warning Events)",
+          "title": "Namespace Health (Warning Events)",
+          "use_case": "namespace_health",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\"\n| stats count AS warnings dc(object.involvedObject.name) AS affected_objects values(object.reason) AS reasons BY object.involvedObject.namespace\n| sort - warnings\n| where warnings > 200",
+          "condition": "warnings > 200",
+          "threshold": 200.0,
+          "severity": "medium",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Review the matching results and confirm the condition is genuine.",
+            "Identify the owning team / asset and notify them.",
+            "Document findings and tune the threshold if this is noise."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\"\n| stats count AS warnings dc(object.involvedObject.name) AS affected_objects values(object.reason) AS reasons BY object.involvedObject.namespace\n| sort - warnings\n| where warnings > 200",
+            "description": "Warning events per namespace with affected objects and reasons.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "4",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[MEDIUM] $name$",
+            "action.email.message.alert": "Splunk alert \"Namespace Health (Warning Events)\" fired.\n\nCondition : warnings > 200\nSeverity  : medium\nSummary   : Warning events per namespace with affected objects and reasons.\n\nRecommended actions:\n- Review the matching results and confirm the condition is genuine.\n- Identify the owning team / asset and notify them.\n- Document findings and tune the threshold if this is noise.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - CrashLoopBackOff Pods",
+          "title": "CrashLoopBackOff Pods",
+          "use_case": "crashloopbackoff",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\")\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)\n| where backoffs > 3",
+          "condition": "backoffs > 3",
+          "threshold": 3.0,
+          "severity": "high",
+          "window": "15m",
+          "cron": "*/15 * * * *",
+          "schedule": "every 15 minutes",
+          "time_range": {
+            "earliest": "-15m@m",
+            "latest": "@m"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace",
+              "object.involvedObject.name"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "kubectl logs <pod> --previous to see the crash reason.",
+            "Roll back the last deployment if the crash started after a release."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\")\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)\n| where backoffs > 3",
+            "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+            "is_scheduled": "1",
+            "cron_schedule": "*/15 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-15m@m",
+            "dispatch.latest_time": "@m",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace,object.involvedObject.name",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"CrashLoopBackOff Pods\" fired.\n\nCondition : backoffs > 3\nSeverity  : high\nSummary   : Pods in CrashLoopBackOff (back-off restarting failed container).\n\nRecommended actions:\n- kubectl logs <pod> --previous to see the crash reason.\n- Roll back the last deployment if the crash started after a release.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - OOMKilled Containers",
+          "title": "OOMKilled Containers",
+          "use_case": "oomkilled",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\")\n| stats count AS oom_events latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - oom_events\n| convert ctime(last_seen)\n| where oom_events > 0",
+          "condition": "oom_events > 0",
+          "threshold": 0.0,
+          "severity": "high",
+          "window": "15m",
+          "cron": "*/15 * * * *",
+          "schedule": "every 15 minutes",
+          "time_range": {
+            "earliest": "-15m@m",
+            "latest": "@m"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace",
+              "object.involvedObject.name"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Compare memory usage against limits for the container.",
+            "Raise limits or fix the leak; check for traffic spikes."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\")\n| stats count AS oom_events latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - oom_events\n| convert ctime(last_seen)\n| where oom_events > 0",
+            "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+            "is_scheduled": "1",
+            "cron_schedule": "*/15 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-15m@m",
+            "dispatch.latest_time": "@m",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace,object.involvedObject.name",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"OOMKilled Containers\" fired.\n\nCondition : oom_events > 0\nSeverity  : high\nSummary   : Containers killed for exceeding memory limits and node-level OOM kills.\n\nRecommended actions:\n- Compare memory usage against limits for the container.\n- Raise limits or fix the leak; check for traffic spikes.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - Failed Scheduling / Pending Pods",
+          "title": "Failed Scheduling / Pending Pods",
+          "use_case": "failed_scheduling",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts\n| where attempts > 5",
+          "condition": "attempts > 5",
+          "threshold": 5.0,
+          "severity": "medium",
+          "window": "15m",
+          "cron": "*/15 * * * *",
+          "schedule": "every 15 minutes",
+          "time_range": {
+            "earliest": "-15m@m",
+            "latest": "@m"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace",
+              "object.involvedObject.name"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Check cluster capacity / autoscaler activity.",
+            "Review requests, nodeSelectors, taints and affinity rules."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts\n| where attempts > 5",
+            "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+            "is_scheduled": "1",
+            "cron_schedule": "*/15 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-15m@m",
+            "dispatch.latest_time": "@m",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "4",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace,object.involvedObject.name",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[MEDIUM] $name$",
+            "action.email.message.alert": "Splunk alert \"Failed Scheduling / Pending Pods\" fired.\n\nCondition : attempts > 5\nSeverity  : medium\nSummary   : Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).\n\nRecommended actions:\n- Check cluster capacity / autoscaler activity.\n- Review requests, nodeSelectors, taints and affinity rules.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - Pod Restart Spikes",
+          "title": "Pod Restart Spikes",
+          "use_case": "pod_restarts",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count AS restart_signals values(object.reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| where restart_signals > 10",
+          "condition": "restart_signals > 10",
+          "threshold": 10.0,
+          "severity": "high",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace",
+              "object.involvedObject.name"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Investigate crash loop: kubectl describe pod / kubectl logs --previous.",
+            "Correlate with recent rollouts (kubectl rollout history).",
+            "Verify resource limits and liveness probe configuration."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count AS restart_signals values(object.reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| where restart_signals > 10",
+            "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace,object.involvedObject.name",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"Pod Restart Spikes\" fired.\n\nCondition : restart_signals > 10\nSeverity  : high\nSummary   : Restart signals (BackOff, Killing, Unhealthy) per pod over time.\n\nRecommended actions:\n- Investigate crash loop: kubectl describe pod / kubectl logs --previous.\n- Correlate with recent rollouts (kubectl rollout history).\n- Verify resource limits and liveness probe configuration.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    },
+    "dashboard": {
+      "name": "auto_kubernetes_cluster_health",
+      "title": "Kubernetes Cluster Health",
+      "panels": [
+        {
+          "title": "Warning Events",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "namespace_health",
+          "description": "Warning events per namespace with affected objects and reasons.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings"
+        },
+        {
+          "title": "CrashLooping Pods",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "crashloopbackoff",
+          "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods"
+        },
+        {
+          "title": "OOMKilled Events",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "oomkilled",
+          "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills"
+        },
+        {
+          "title": "Unschedulable Pods",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "failed_scheduling",
+          "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods"
+        },
+        {
+          "title": "Warning Events by Namespace",
+          "kind": "chart",
+          "visualization": "line",
+          "studio_type": "splunk.line",
+          "use_case": "k8s_warning_trend",
+          "description": "Warning events over time per namespace.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true"
+        },
+        {
+          "title": "Restart Signals by Pod",
+          "kind": "chart",
+          "visualization": "line",
+          "studio_type": "splunk.line",
+          "use_case": "pod_restarts",
+          "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true"
+        },
+        {
+          "title": "CPU by Pod",
+          "kind": "chart",
+          "visualization": "line",
+          "studio_type": "splunk.line",
+          "use_case": "container_cpu_usage",
+          "description": "CPU utilisation per pod from OpenTelemetry/kubelet metrics.",
+          "drilldown": "linkToSearch",
+          "spl": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true"
+        },
+        {
+          "title": "Memory % of Limit by Pod",
+          "kind": "chart",
+          "visualization": "line",
+          "studio_type": "splunk.line",
+          "use_case": "memory_utilization",
+          "description": "Memory working set as a percentage of the container limit, per pod.",
+          "drilldown": "linkToSearch",
+          "spl": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true"
+        },
+        {
+          "title": "CrashLoopBackOff Details",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "crashloopbackoff",
+          "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)"
+        },
+        {
+          "title": "Top Pods by Restarts",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "top_pods_restart_count",
+          "description": "Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+          "drilldown": "linkToSearch",
+          "spl": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10"
+        },
+        {
+          "title": "Node Conditions",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "node_issues",
+          "description": "NotReady, pressure conditions, reboots and kubelet problems per node.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)"
+        },
+        {
+          "title": "Deployment Failures",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "deployment_failures",
+          "description": "Failed rollouts and controller errors for Deployments/ReplicaSets/StatefulSets/DaemonSets.",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)"
+        },
+        {
+          "title": "Scheduling Failures",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "failed_scheduling",
+          "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+          "drilldown": "linkToSearch",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts"
+        }
+      ],
+      "definition": {
+        "title": "Kubernetes Cluster Health",
+        "description": "Workload stability, scheduling, node conditions and resource usage.",
+        "inputs": {
+          "input_global_trp": {
+            "type": "input.timerange",
+            "title": "Time Range",
+            "options": {
+              "token": "global_time",
+              "defaultValue": "-24h@h,now"
+            }
+          },
+          "input_namespace": {
+            "type": "input.text",
+            "title": "Namespace",
+            "options": {
+              "token": "namespace",
+              "defaultValue": "*"
+            }
+          }
+        },
+        "defaults": {
+          "dataSources": {
+            "ds.search": {
+              "options": {
+                "queryParameters": {
+                  "earliest": "$global_time.earliest$",
+                  "latest": "$global_time.latest$"
+                }
+              }
+            }
+          }
+        },
+        "visualizations": {
+          "viz_warning_events": {
+            "type": "splunk.singlevalue",
+            "title": "Warning Events",
+            "description": "Warning events per namespace with affected objects and reasons.",
+            "dataSources": {
+              "primary": "ds_warning_events"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_crashlooping_pods": {
+            "type": "splunk.singlevalue",
+            "title": "CrashLooping Pods",
+            "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+            "dataSources": {
+              "primary": "ds_crashlooping_pods"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_oomkilled_events": {
+            "type": "splunk.singlevalue",
+            "title": "OOMKilled Events",
+            "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+            "dataSources": {
+              "primary": "ds_oomkilled_events"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_unschedulable_pods": {
+            "type": "splunk.singlevalue",
+            "title": "Unschedulable Pods",
+            "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+            "dataSources": {
+              "primary": "ds_unschedulable_pods"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_warning_events_by_namespace": {
+            "type": "splunk.line",
+            "title": "Warning Events by Namespace",
+            "description": "Warning events over time per namespace.",
+            "dataSources": {
+              "primary": "ds_warning_events_by_namespace"
+            },
+            "options": {
+              "legendDisplay": "right",
+              "nullValueDisplay": "zero"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_restart_signals_by_pod": {
+            "type": "splunk.line",
+            "title": "Restart Signals by Pod",
+            "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+            "dataSources": {
+              "primary": "ds_restart_signals_by_pod"
+            },
+            "options": {
+              "legendDisplay": "right",
+              "nullValueDisplay": "zero"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_cpu_by_pod": {
+            "type": "splunk.line",
+            "title": "CPU by Pod",
+            "description": "CPU utilisation per pod from OpenTelemetry/kubelet metrics.",
+            "dataSources": {
+              "primary": "ds_cpu_by_pod"
+            },
+            "options": {
+              "legendDisplay": "right",
+              "nullValueDisplay": "zero"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_memory_of_limit_by_pod": {
+            "type": "splunk.line",
+            "title": "Memory % of Limit by Pod",
+            "description": "Memory working set as a percentage of the container limit, per pod.",
+            "dataSources": {
+              "primary": "ds_memory_of_limit_by_pod"
+            },
+            "options": {
+              "legendDisplay": "right",
+              "nullValueDisplay": "zero"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_crashloopbackoff_details": {
+            "type": "splunk.table",
+            "title": "CrashLoopBackOff Details",
+            "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+            "dataSources": {
+              "primary": "ds_crashloopbackoff_details"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_top_pods_by_restarts": {
+            "type": "splunk.table",
+            "title": "Top Pods by Restarts",
+            "description": "Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+            "dataSources": {
+              "primary": "ds_top_pods_by_restarts"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_node_conditions": {
+            "type": "splunk.table",
+            "title": "Node Conditions",
+            "description": "NotReady, pressure conditions, reboots and kubelet problems per node.",
+            "dataSources": {
+              "primary": "ds_node_conditions"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_deployment_failures": {
+            "type": "splunk.table",
+            "title": "Deployment Failures",
+            "description": "Failed rollouts and controller errors for Deployments/ReplicaSets/StatefulSets/DaemonSets.",
+            "dataSources": {
+              "primary": "ds_deployment_failures"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_scheduling_failures": {
+            "type": "splunk.table",
+            "title": "Scheduling Failures",
+            "description": "Pods the scheduler could not place, with the reason (insufficient CPU/memory, taints, affinity).",
+            "dataSources": {
+              "primary": "ds_scheduling_failures"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          }
+        },
+        "dataSources": {
+          "ds_warning_events": {
+            "type": "ds.search",
+            "name": "Warning Events",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| stats count AS warnings",
+              "enableSmartSources": true
+            }
+          },
+          "ds_crashlooping_pods": {
+            "type": "ds.search",
+            "name": "CrashLooping Pods",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS crashlooping_pods",
+              "enableSmartSources": true
+            }
+          },
+          "ds_oomkilled_events": {
+            "type": "ds.search",
+            "name": "OOMKilled Events",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS oom_kills",
+              "enableSmartSources": true
+            }
+          },
+          "ds_unschedulable_pods": {
+            "type": "ds.search",
+            "name": "Unschedulable Pods",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| stats dc(object.involvedObject.name) AS pending_pods",
+              "enableSmartSources": true
+            }
+          },
+          "ds_warning_events_by_namespace": {
+            "type": "ds.search",
+            "name": "Warning Events by Namespace",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.type=\"Warning\" object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true",
+              "enableSmartSources": true
+            }
+          },
+          "ds_restart_signals_by_pod": {
+            "type": "ds.search",
+            "name": "Restart Signals by Pod",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\") object.involvedObject.namespace=\"$namespace$\"\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+              "enableSmartSources": true
+            }
+          },
+          "ds_cpu_by_pod": {
+            "type": "ds.search",
+            "name": "CPU by Pod",
+            "options": {
+              "query": "| mstats avg(container.cpu.utilization) AS cpu WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| timechart span=5m max(cpu) AS cpu BY k8s.pod.name limit=10 useother=true",
+              "enableSmartSources": true
+            }
+          },
+          "ds_memory_of_limit_by_pod": {
+            "type": "ds.search",
+            "name": "Memory % of Limit by Pod",
+            "options": {
+              "query": "| mstats avg(container.memory.usage) AS mem_bytes max(k8s.container.memory_limit) AS mem_limit WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| eval mem_pct=if(mem_limit > 0, round(mem_bytes / mem_limit * 100, 2), null())\n| timechart span=5m max(mem_pct) AS mem_pct BY k8s.pod.name limit=10 useother=true",
+              "enableSmartSources": true
+            }
+          },
+          "ds_crashloopbackoff_details": {
+            "type": "ds.search",
+            "name": "CrashLoopBackOff Details",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)",
+              "enableSmartSources": true
+            }
+          },
+          "ds_top_pods_by_restarts": {
+            "type": "ds.search",
+            "name": "Top Pods by Restarts",
+            "options": {
+              "query": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics k8s.namespace.name=\"$namespace$\" span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10",
+              "enableSmartSources": true
+            }
+          },
+          "ds_node_conditions": {
+            "type": "ds.search",
+            "name": "Node Conditions",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Node\" object.reason IN (\"NodeNotReady\", \"NodeNotSchedulable\", \"NodeHasDiskPressure\", \"NodeHasMemoryPressure\", \"NodeHasPIDPressure\", \"EvictionThresholdMet\", \"Rebooted\", \"SystemOOM\", \"NodeHasInsufficientMemory\", \"KubeletNotReady\")\n| stats count AS events values(object.reason) AS conditions latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.name\n| rename object.involvedObject.name AS node\n| sort - events\n| convert ctime(last_seen)",
+              "enableSmartSources": true
+            }
+          },
+          "ds_deployment_failures": {
+            "type": "ds.search",
+            "name": "Deployment Failures",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind IN (\"Deployment\", \"ReplicaSet\", \"StatefulSet\", \"DaemonSet\") object.reason IN (\"FailedCreate\", \"ProgressDeadlineExceeded\", \"FailedDelete\", \"ReplicaSetCreateError\", \"FailedUpdate\") object.involvedObject.namespace=\"$namespace$\"\n| stats count AS failures values(object.reason) AS reasons latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.kind object.involvedObject.name\n| sort - failures\n| convert ctime(last_seen)",
+              "enableSmartSources": true
+            }
+          },
+          "ds_scheduling_failures": {
+            "type": "ds.search",
+            "name": "Scheduling Failures",
+            "options": {
+              "query": "index=k8s_events sourcetype=\"kube:object:events\" object.reason=\"FailedScheduling\" object.involvedObject.namespace=\"$namespace$\"\n| rex field=object.message \"(?<scheduling_reason>Insufficient \\w+|untolerated taint|didn't match [^,.]+|volume node affinity conflict)\"\n| stats count AS attempts values(scheduling_reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| sort - attempts",
+              "enableSmartSources": true
+            }
+          }
+        },
+        "layout": {
+          "type": "absolute",
+          "options": {
+            "width": 1440,
+            "height": 2640,
+            "display": "auto-scale"
+          },
+          "structure": [
+            {
+              "item": "viz_warning_events",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_crashlooping_pods",
+              "type": "block",
+              "position": {
+                "x": 360,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_oomkilled_events",
+              "type": "block",
+              "position": {
+                "x": 720,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_unschedulable_pods",
+              "type": "block",
+              "position": {
+                "x": 1080,
+                "y": 0,
+                "w": 360,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_warning_events_by_namespace",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 130,
+                "w": 710,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_restart_signals_by_pod",
+              "type": "block",
+              "position": {
+                "x": 720,
+                "y": 130,
+                "w": 720,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_cpu_by_pod",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 460,
+                "w": 710,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_memory_of_limit_by_pod",
+              "type": "block",
+              "position": {
+                "x": 720,
+                "y": 460,
+                "w": 720,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_crashloopbackoff_details",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 790,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_top_pods_by_restarts",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1160,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_node_conditions",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1530,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_deployment_failures",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1900,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_scheduling_failures",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 2270,
+                "w": 1440,
+                "h": 360
+              }
+            }
+          ],
+          "globalInputs": [
+            "input_global_trp",
+            "input_namespace"
+          ]
+        }
+      }
+    }
+  },
+  "warnings": []
+}

@@ -1,0 +1,5 @@
+((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype="WinEventLog:Security")) earliest=-24h latest=now action IN ("failure", "failed", "fail")
+| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user
+| sort - failures
+| head 25
+| convert ctime(last_seen)

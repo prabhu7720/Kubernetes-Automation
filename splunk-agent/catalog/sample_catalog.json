@@ -1,0 +1,1686 @@
+{
+  "schema_version": 1,
+  "exported_at": 1792506877.056013,
+  "meta": {
+    "schema_version": "1",
+    "last_discovery": "{\"at\": 1792506877.0449433, \"ok\": true, \"note\": \"synthetic sample catalog\"}"
+  },
+  "indexes": [
+    {
+      "name": "app_logs",
+      "datatype": "event",
+      "event_count": 31000000,
+      "size_mb": 3444.4,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "auth",
+      "datatype": "event",
+      "event_count": 4200000,
+      "size_mb": 466.7,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "aws",
+      "datatype": "event",
+      "event_count": 7000000,
+      "size_mb": 777.8,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "azure",
+      "datatype": "event",
+      "event_count": 3100000,
+      "size_mb": 344.4,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "dns",
+      "datatype": "event",
+      "event_count": 64000000,
+      "size_mb": 7111.1,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "endpoint",
+      "datatype": "event",
+      "event_count": 900000,
+      "size_mb": 100.0,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "firewall",
+      "datatype": "event",
+      "event_count": 120000000,
+      "size_mb": 13333.3,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "k8s_events",
+      "datatype": "event",
+      "event_count": 2500000,
+      "size_mb": 277.8,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "k8s_logs",
+      "datatype": "event",
+      "event_count": 90000000,
+      "size_mb": 10000.0,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "k8s_metrics",
+      "datatype": "metric",
+      "event_count": 0,
+      "size_mb": 0.0,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "main",
+      "datatype": "event",
+      "event_count": 10000,
+      "size_mb": 1.1,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "os",
+      "datatype": "event",
+      "event_count": 22000000,
+      "size_mb": 2444.4,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "web",
+      "datatype": "event",
+      "event_count": 52000000,
+      "size_mb": 5777.8,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    },
+    {
+      "name": "wineventlog",
+      "datatype": "event",
+      "event_count": 18000000,
+      "size_mb": 2000.0,
+      "earliest": null,
+      "latest": null,
+      "disabled": false
+    }
+  ],
+  "datasets": [
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "event_count": 11200,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "event_count": 11000,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "event_count": 10800,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "event_count": 10800,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "event_count": 10800,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "event_count": 10800,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "event_count": 10700,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "event_count": 10600,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "event_count": 10600,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "event_count": 10500,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "event_count": 10500,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "event_count": 10500,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "event_count": 10500,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "event_count": 10500,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:monitor:activity",
+      "event_count": 10400,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:config",
+      "event_count": 10400,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:nginx",
+      "event_count": 10400,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "os",
+      "sourcetype": "syslog",
+      "event_count": 10300,
+      "last_seen": 1792506817.0449433
+    },
+    {
+      "index": "os",
+      "sourcetype": "vmstat",
+      "event_count": 10300,
+      "last_seen": 1792506817.0449433
+    }
+  ],
+  "fields": [
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "application",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "checkout",
+        "payments",
+        "catalog"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "environment",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "level",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "INFO",
+        "WARN",
+        "ERROR"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "message",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "response_time",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "status_code",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "app_logs",
+      "sourcetype": "_json",
+      "name": "trace_id",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "action",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "success",
+        "failure"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "app",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "dest",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "process",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "auth",
+      "sourcetype": "linux_secure",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "awsRegion",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "errorCode",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "errorMessage",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "eventName",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "eventSource",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "eventType",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "responseElements.ConsoleLogin",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "sourceIPAddress",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "userIdentity.arn",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "aws",
+      "sourcetype": "aws:cloudtrail",
+      "name": "userIdentity.type",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "properties.ipAddress",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "properties.userPrincipalName",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "resultDescription",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "resultType",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:aad:signin",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:monitor:activity",
+      "name": "caller",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:monitor:activity",
+      "name": "operationName.value",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:monitor:activity",
+      "name": "resourceGroupName",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "azure",
+      "sourcetype": "azure:monitor:activity",
+      "name": "status.value",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "name": "dest",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "name": "query",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "name": "reply_code",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "NoError",
+        "NXDOMAIN",
+        "SERVFAIL"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "dns",
+      "sourcetype": "stream:dns",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "action",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "success",
+        "failure"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "dest",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "file_name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "signature",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "endpoint",
+      "sourcetype": "symantec:ep:risk:file",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:config",
+      "name": "cmd",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:config",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:config",
+      "name": "type",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:config",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "action",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "success",
+        "failure"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "app",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "dest",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "dest_port",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "transport",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "firewall",
+      "sourcetype": "pan:traffic",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.involvedObject.kind",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.involvedObject.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.involvedObject.namespace",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.message",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.reason",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "BackOff",
+        "Killing",
+        "FailedScheduling",
+        "OOMKilling"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.source.host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_events",
+      "sourcetype": "kube:object:events",
+      "name": "object.type",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "name": "k8s.container.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "name": "k8s.namespace.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "name": "k8s.node.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:checkout",
+      "name": "k8s.pod.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:nginx",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:nginx",
+      "name": "k8s.container.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:nginx",
+      "name": "k8s.namespace.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:nginx",
+      "name": "k8s.pod.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "name": "k8s.container.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "name": "k8s.namespace.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "name": "k8s.node.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_logs",
+      "sourcetype": "kube:container:payments-api",
+      "name": "k8s.pod.name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "container.cpu.utilization",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "metric"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "container.memory.usage",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "metric"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.cluster.name",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "dimension"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.container.memory_limit",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "metric"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.container.name",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "dimension"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.container.restarts",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "metric"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.namespace.name",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "dimension"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.node.name",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "dimension"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.pod.name",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "dimension"
+    },
+    {
+      "index": "k8s_metrics",
+      "sourcetype": "__metrics__",
+      "name": "k8s.pod.phase",
+      "coverage": 1.0,
+      "distinct_count": 0,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "metric"
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "name": "CPU",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "name": "pctIdle",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "name": "pctSystem",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "cpu",
+      "name": "pctUser",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "name": "Avail",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "name": "Filesystem",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "name": "MountedOn",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "name": "UsePct",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "df",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "syslog",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "syslog",
+      "name": "message",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "syslog",
+      "name": "process",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "vmstat",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "vmstat",
+      "name": "memFreeMB",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "os",
+      "sourcetype": "vmstat",
+      "name": "memUsedPct",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "bytes",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "clientip",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "method",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "request_time",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": true,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "status",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "200",
+        "404",
+        "500"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "uri",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "web",
+      "sourcetype": "access_combined",
+      "name": "useragent",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "Account_Name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "Caller_Computer_Name",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "EventCode",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "action",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [
+        "success",
+        "failure"
+      ],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "dest",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "host",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "signature",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "src",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "src_user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    },
+    {
+      "index": "wineventlog",
+      "sourcetype": "WinEventLog:Security",
+      "name": "user",
+      "coverage": 0.95,
+      "distinct_count": 50,
+      "sample_values": [],
+      "is_numeric": false,
+      "kind": "field"
+    }
+  ],
+  "datamodels": [
+    {
+      "name": "Authentication",
+      "app": "Splunk_SA_CIM",
+      "accelerated": true,
+      "objects": [
+        "Authentication"
+      ]
+    },
+    {
+      "name": "Malware",
+      "app": "Splunk_SA_CIM",
+      "accelerated": true,
+      "objects": [
+        "Malware_Attacks"
+      ]
+    },
+    {
+      "name": "Network_Resolution",
+      "app": "Splunk_SA_CIM",
+      "accelerated": true,
+      "objects": [
+        "DNS"
+      ]
+    },
+    {
+      "name": "Network_Traffic",
+      "app": "Splunk_SA_CIM",
+      "accelerated": false,
+      "objects": [
+        "All_Traffic"
+      ]
+    },
+    {
+      "name": "Web",
+      "app": "Splunk_SA_CIM",
+      "accelerated": false,
+      "objects": [
+        "Web"
+      ]
+    }
+  ],
+  "knowledge_objects": [
+    {
+      "kind": "alert",
+      "name": "Excessive HTTP 5xx",
+      "app": "ops",
+      "owner": "nobody",
+      "attributes": {
+        "search": "index=web status>=500"
+      }
+    },
+    {
+      "kind": "dashboard",
+      "name": "k8s_overview",
+      "app": "ops",
+      "owner": "nobody",
+      "attributes": {
+        "label": "K8s Overview",
+        "studio": true
+      }
+    },
+    {
+      "kind": "kvstore",
+      "name": "asset_inventory",
+      "app": "search",
+      "owner": "nobody",
+      "attributes": {
+        "fields": [
+          "host",
+          "owner",
+          "pci"
+        ]
+      }
+    },
+    {
+      "kind": "lookup_definition",
+      "name": "threat_intel_ip",
+      "app": "SA-ThreatIntelligence",
+      "owner": "nobody",
+      "attributes": {
+        "type": "kvstore",
+        "fields": [
+          "ip",
+          "threat_category",
+          "threat_source"
+        ]
+      }
+    },
+    {
+      "kind": "lookup_file",
+      "name": "pci_cde_assets.csv",
+      "app": "search",
+      "owner": "nobody",
+      "attributes": {}
+    },
+    {
+      "kind": "report",
+      "name": "Daily Failed Logins Summary",
+      "app": "search",
+      "owner": "admin",
+      "attributes": {
+        "search": "index=auth action=failure | stats count by user",
+        "is_scheduled": true
+      }
+    }
+  ],
+  "entities": [
+    {
+      "kind": "host",
+      "name": "db01",
+      "event_count": 1000,
+      "last_seen": 1792506877.0449433
+    },
+    {
+      "kind": "host",
+      "name": "k8s-node-1",
+      "event_count": 1000,
+      "last_seen": 1792506877.0449433
+    },
+    {
+      "kind": "host",
+      "name": "web01",
+      "event_count": 1000,
+      "last_seen": 1792506877.0449433
+    },
+    {
+      "kind": "host",
+      "name": "web02",
+      "event_count": 1000,
+      "last_seen": 1792506877.0449433
+    },
+    {
+      "kind": "source",
+      "name": "/var/log/secure",
+      "event_count": 5000,
+      "last_seen": 1792506877.0449433
+    }
+  ]
+}

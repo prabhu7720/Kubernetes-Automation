@@ -1,0 +1,2 @@
+index=k8s_events sourcetype="kube:object:events" earliest=-24h latest=now object.involvedObject.kind="Pod" object.reason IN ("BackOff", "Killing", "Unhealthy")
+| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true

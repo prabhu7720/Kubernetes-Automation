@@ -1,0 +1,2 @@
+index=web sourcetype=access_combined earliest=-24h latest=now status IN (500)
+| timechart span=1h count BY status

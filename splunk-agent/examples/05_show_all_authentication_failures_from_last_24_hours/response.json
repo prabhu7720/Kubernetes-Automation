@@ -1,0 +1,259 @@
+{
+  "request": "Show all authentication failures from last 24 hours",
+  "title": "Failed Logins",
+  "artifact_type": "search",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Show all authentication failures from last 24 hours",
+    "artifact_type": "search",
+    "tokens": [
+      "auth",
+      "fail"
+    ],
+    "time_range": {
+      "earliest": "-24h",
+      "latest": "now",
+      "label": "last 24 hours"
+    },
+    "threshold": null,
+    "comparator": null,
+    "percent": false,
+    "window": null,
+    "status_codes": [],
+    "limit": null,
+    "groupby": null,
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "failed_logins"
+  ],
+  "alternatives": [
+    "auth_failure_trend"
+  ],
+  "generated_spl": [
+    {
+      "use_case": "failed_logins",
+      "title": "Failed Logins",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user\n| sort - failures\n| head 25\n| convert ctime(last_seen)",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user\n| sort - failures\n| head 25\n| convert ctime(last_seen)",
+      "accelerated_spl": "| tstats summariesonly=true count AS failures dc(Authentication.src) AS distinct_sources FROM datamodel=Authentication WHERE Authentication.action=\"failure\" earliest=-24h latest=now BY Authentication.user\n| rename Authentication.* AS *\n| sort - failures\n| head 25",
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 25,
+      "groupby": "user",
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "src": "src",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Failed Logins': Failed authentication attempts aggregated by account with source context.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+        "`stats` computes count, dc(src) as distinct_sources, values(src) as sources, latest(_time) as last_seen grouped by user.",
+        "`sort` orders results by descending failures.",
+        "`head` keeps the first 25 rows.",
+        "`convert` formats ctime(last_seen) as human-readable time.",
+        "The 'Authentication' data model is accelerated - the tstats variant returns the same answer far faster."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Use case 'Failed Logins': Failed authentication attempts aggregated by account with source context.",
+    "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+    "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+    "`stats` computes count, dc(src) as distinct_sources, values(src) as sources, latest(_time) as last_seen grouped by user.",
+    "`sort` orders results by descending failures.",
+    "`head` keeps the first 25 rows.",
+    "`convert` formats ctime(last_seen) as human-readable time.",
+    "The 'Authentication' data model is accelerated - the tstats variant returns the same answer far faster."
+  ],
+  "visualization": {
+    "primary": "table",
+    "studio_type": "splunk.table",
+    "rationale": "1 dimension(s) and 3 measure(s) - a table preserves detail.",
+    "alternatives": [
+      "column"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "Failed Logins (total)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "failed_logins",
+      "description": "Failed authentication attempts aggregated by account with source context.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures"
+    },
+    {
+      "title": "Failed Logins",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "failed_logins",
+      "description": "Failed authentication attempts aggregated by account with source context.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user\n| sort - failures\n| head 25\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "Failed Logins - Trend",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "failed_logins",
+      "description": "Failed authentication attempts aggregated by account with source context.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count"
+    },
+    {
+      "title": "Brute Force Attack Detection",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "brute_force",
+      "description": "Sources generating many failed logins within a short window.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| bin _time span=5m\n| stats count AS failures dc(user) AS targeted_accounts values(user) AS accounts BY _time src\n| where failures >= 20\n| sort - failures"
+    },
+    {
+      "title": "Account Lockouts",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "account_lockouts",
+      "description": "Accounts locked out (Windows 4740) with the calling computer.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode=4740\n| stats count AS lockouts latest(_time) AS last_lockout values(src) AS caller_hosts BY user\n| sort - lockouts\n| convert ctime(last_lockout)"
+    },
+    {
+      "title": "Authentication Failure Trend",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "auth_failure_trend",
+      "description": "Volume of failed authentications over time to spot spikes and attack waves.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - Failed Logins",
+      "title": "Failed Logins",
+      "description": "Failed authentication attempts aggregated by account with source context.",
+      "business_description": "Detects credential misuse early and evidences access-control monitoring for audits.",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user\n| sort - failures\n| head 25\n| convert ctime(last_seen)",
+      "schedule": {
+        "cron": "0 6 * * *",
+        "human": "daily at 06:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "table",
+      "saved_search_params": {
+        "search": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources latest(_time) AS last_seen BY user\n| sort - failures\n| head 25\n| convert ctime(last_seen)",
+        "description": "Failed authentication attempts aggregated by account with source context.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "statistics",
+        "display.page.search.tab": "statistics",
+        "cron_schedule": "0 6 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": false,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - Failed Logins",
+          "title": "Failed Logins",
+          "use_case": "failed_logins",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources BY user\n| where failures > 10",
+          "condition": "failures > 10",
+          "threshold": 10.0,
+          "severity": "medium",
+          "window": "15m",
+          "cron": "*/15 * * * *",
+          "schedule": "every 15 minutes",
+          "time_range": {
+            "earliest": "-15m@m",
+            "latest": "@m"
+          },
+          "throttle": {
+            "fields": [
+              "user"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Validate whether the account owner initiated the attempts.",
+            "Check source IPs against threat intel and VPN/geo baselines.",
+            "Lock or reset credentials if compromise is suspected."
+          ],
+          "saved_search_params": {
+            "search": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(src) AS distinct_sources values(src) AS sources BY user\n| where failures > 10",
+            "description": "Failed authentication attempts aggregated by account with source context.",
+            "is_scheduled": "1",
+            "cron_schedule": "*/15 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-15m@m",
+            "dispatch.latest_time": "@m",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "4",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "user",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[MEDIUM] $name$",
+            "action.email.message.alert": "Splunk alert \"Failed Logins\" fired.\n\nCondition : failures > 10\nSeverity  : medium\nSummary   : Failed authentication attempts aggregated by account with source context.\n\nRecommended actions:\n- Validate whether the account owner initiated the attempts.\n- Check source IPs against threat intel and VPN/geo baselines.\n- Lock or reset credentials if compromise is suspected.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    }
+  },
+  "warnings": [
+    "Existing report 'Daily Failed Logins Summary' (app search) looks similar - consider reusing it."
+  ]
+}

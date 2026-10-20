@@ -1,0 +1,34 @@
+# Example DECLARATIVE rule pack - no Python needed.
+# Drop any *.yaml file like this into rules/ (or a directory listed in plugins.rule_dirs)
+# and the agent gains the capability on next start.
+domain: nginx
+title: NGINX / ingress-nginx
+description: Upstream and gateway errors from NGINX error logs.
+exclusive: true
+domain_keywords: [nginx, ingress, "ingress nginx"]
+datasources:
+  nginx_error:
+    index_patterns: ["web*", "nginx*", "ingress*"]
+    sourcetype_patterns: ["nginx:plus:error", "nginx:error", "nginx_error", "kube:container:*nginx*"]
+    default_index: web
+    default_sourcetype: "nginx:error"
+use_cases:
+  - id: nginx_upstream_errors
+    name: NGINX Upstream Errors
+    description: Upstream timeouts and connection failures reported by NGINX / ingress-nginx.
+    datasource: nginx_error
+    keywords: ["upstream error", "upstream timeout", "nginx 502", "bad gateway", "nginx error", "gateway error"]
+    filter: '("upstream timed out" OR "connect() failed" OR "no live upstreams" OR "upstream prematurely closed")'
+    pipeline: |
+      | rex "upstream: \"(?<upstream>[^\"]+)\""
+      | stats count AS errors BY {{f.host}} upstream
+      | sort - errors
+    visualization: table
+    alert:
+      threshold: 50
+      metric: errors
+      severity: high
+      window: 15m
+      recommended_actions:
+        - Check upstream pod/service health and endpoints (kubectl get endpoints).
+        - Review ingress-nginx controller logs and upstream keepalive/timeouts.

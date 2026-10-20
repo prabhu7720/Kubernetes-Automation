@@ -1,0 +1,4 @@
+index=app_logs sourcetype=_json earliest=-24h latest=now level IN ("ERROR", "FATAL", "CRITICAL")
+| stats count AS errors BY application
+| sort - errors
+| head 10

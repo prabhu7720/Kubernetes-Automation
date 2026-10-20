@@ -1,0 +1,10 @@
+Splunk alert "$title" fired.
+
+Condition : $condition
+Severity  : $severity
+Summary   : $description
+
+Recommended actions:
+$actions
+
+Results: $results.link$

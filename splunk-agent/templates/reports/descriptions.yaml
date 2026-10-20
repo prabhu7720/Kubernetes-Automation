@@ -1,0 +1,10 @@
+# Business descriptions used when a use case has no explicit business_value.
+# Placeholders: $name, $description
+default: "$name - $description Scheduled to give stakeholders a consistent, repeatable view."
+security: "$name supports security monitoring and audit evidence: $description"
+kubernetes: "$name tracks platform reliability so SRE teams can act before users are affected: $description"
+infrastructure: "$name provides capacity and health visibility for operations: $description"
+application: "$name measures customer-facing service quality: $description"
+aws: "$name provides cloud control-plane governance for AWS: $description"
+azure: "$name provides cloud control-plane governance for Azure: $description"
+compliance: "$name provides PCI DSS evidence for assessors (QSA): $description"

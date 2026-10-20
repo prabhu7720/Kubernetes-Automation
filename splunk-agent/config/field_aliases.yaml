@@ -1,0 +1,57 @@
+# Canonical field -> candidate field names (first match in the catalog wins).
+# Covers CIM, vendor TAs, OpenTelemetry and Splunk Connect for Kubernetes naming.
+fields:
+  user: [user, username, user_name, src_user, Account_Name, userName, userPrincipalName,
+         properties.userPrincipalName, UserPrincipalName, actor.alternateId, identity]
+  src: [src, src_ip, source_ip, clientip, client_ip, ClientIP, c_ip, sourceIPAddress, ipAddress,
+        properties.ipAddress, callerIpAddress, Source_Network_Address, Caller_Computer_Name, remote_addr]
+  dest: [dest, dest_host, dest_ip, dvc, ComputerName, Computer, host]
+  dest_port: [dest_port, dport, destination_port, dpt]
+  action: [action, result, outcome, status_action]
+  src_user: [src_user, SubjectUserName, Subject_Account_Name]
+  event_code: [EventCode, EventID, event_id, signature_id]
+  signature: [signature, threat_name, virus_name, malware_name, DetectName, risk_name]
+  file_name: [file_name, FileName, file, filename]
+  host: [host]
+  status_code: [status, status_code, http_status, sc_status, response_code, statusCode]
+  uri: [uri, uri_path, url, request_path, cs_uri_stem, path, endpoint]
+  response_time: [response_time, duration, latency, time_taken, elapsed_ms, request_time, responseTime]
+  application: [application, app, app_name, service, service_name, appname]
+  level: [level, log_level, severity, loglevel, lvl]
+  environment: [environment, env, deployment_environment]
+  process: [process, process_name, program, app]
+  # DNS
+  query: [query, dns_query, qname, query_name]
+  reply_code: [reply_code, rcode, dns_response_code, reply_code_id]
+  # Kubernetes (events / logs / metrics dimensions)
+  pod: [pod, pod_name, k8s.pod.name, kubernetes.pod_name, object.involvedObject.name, involvedObject.name]
+  namespace: [namespace, k8s.namespace.name, kubernetes.namespace_name, object.involvedObject.namespace,
+              involvedObject.namespace, object.metadata.namespace]
+  container: [container, container_name, k8s.container.name, kubernetes.container_name]
+  node: [node, node_name, k8s.node.name, kubernetes.host, object.source.host]
+  reason: [reason, object.reason, k8s.event.reason]
+  message: [message, object.message, msg, k8s.event.message]
+  type: [type, object.type]
+  object_kind: [object_kind, object.involvedObject.kind, involvedObject.kind, kind]
+  object_name: [object_name, object.involvedObject.name, involvedObject.name]
+  cluster: [cluster, k8s.cluster.name, cluster_name]
+  # OS (Splunk Add-on for Unix and Linux)
+  cpu_id: [CPU, cpu]
+  cpu_idle: [pctIdle, cpu_idle, idle]
+  mem_used_pct: [memUsedPct, mem_used_percent, memory_used_pct]
+  disk_used_pct: [UsePct, use_pct, used_pct, storage_used_percent]
+  disk_avail: [Avail, available, storage_free]
+  mount: [MountedOn, mount, mount_point, Filesystem]
+  # Azure
+  result_type: [resultType, ResultType, properties.status.errorCode, status.errorCode]
+  result_description: [resultDescription, ResultDescription, properties.status.failureReason, status.failureReason]
+  operation: [operationName.value, operationName, OperationNameValue, properties.operationName]
+  caller: [caller, Caller, identity.claims.name, properties.caller]
+  resource_group: [resourceGroupName, ResourceGroup, resource_group, properties.resourceGroup]
+  activity_status: [status.value, ActivityStatusValue, activityStatusValue, properties.status]
+
+metrics:
+  cpu: [container.cpu.utilization, k8s.pod.cpu.utilization, k8s.container.cpu_limit_utilization, kube.container.cpu.usage]
+  memory: [container.memory.working_set, container.memory.usage, k8s.pod.memory.usage, kube.container.memory.usage]
+  memory_limit: [k8s.container.memory_limit, kube.container.memory.limit]
+  restarts: [k8s.container.restarts, kube.container.restarts]

@@ -1,0 +1,2 @@
+index=k8s_events sourcetype="kube:object:events" earliest=-24h latest=now object.type="Warning"
+| timechart span=15m count BY object.involvedObject.namespace limit=10 useother=true

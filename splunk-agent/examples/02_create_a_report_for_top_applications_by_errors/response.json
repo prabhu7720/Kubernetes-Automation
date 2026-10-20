@@ -1,0 +1,239 @@
+{
+  "request": "Create a report for top applications by errors",
+  "title": "Top Applications by Error Volume",
+  "artifact_type": "report",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Create a report for top applications by errors",
+    "artifact_type": "report",
+    "tokens": [
+      "top",
+      "application",
+      "error"
+    ],
+    "time_range": null,
+    "threshold": null,
+    "comparator": null,
+    "percent": false,
+    "window": null,
+    "status_codes": [],
+    "limit": null,
+    "groupby": "application",
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "top_app_errors"
+  ],
+  "alternatives": [
+    "app_error_trend",
+    "app_exceptions"
+  ],
+  "generated_spl": [
+    {
+      "use_case": "top_app_errors",
+      "title": "Top Applications by Error Volume",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| sort - errors\n| head 10",
+      "adhoc_spl": "index=app_logs sourcetype=_json earliest=-24h latest=now level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| sort - errors\n| head 10",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": "application",
+      "datasource": {
+        "profile": "app_logs",
+        "datasets": [
+          {
+            "index": "app_logs",
+            "sourcetype": "_json"
+          }
+        ],
+        "base": "index=app_logs sourcetype=_json",
+        "field_map": {
+          "application": "application",
+          "level": "level"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Top Applications by Error Volume': Displays applications generating the largest number of errors.",
+        "Datasource 'app_logs' resolved to index=app_logs sourcetype=_json (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index app_logs (sourcetype _json) for -24h to now matching: level IN (\"ERROR\", \"FATAL\", \"CRITICAL\").",
+        "`stats` computes count grouped by application.",
+        "`sort` orders results by descending errors.",
+        "`head` keeps the first 10 rows."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Use case 'Top Applications by Error Volume': Displays applications generating the largest number of errors.",
+    "Datasource 'app_logs' resolved to index=app_logs sourcetype=_json (selected from the discovered catalog, confidence 100%).",
+    "Retrieves events from index app_logs (sourcetype _json) for -24h to now matching: level IN (\"ERROR\", \"FATAL\", \"CRITICAL\").",
+    "`stats` computes count grouped by application.",
+    "`sort` orders results by descending errors.",
+    "`head` keeps the first 10 rows."
+  ],
+  "visualization": {
+    "primary": "column",
+    "studio_type": "splunk.column",
+    "rationale": "One category with one measure - ranked column chart.",
+    "alternatives": [
+      "bar",
+      "pie",
+      "table"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "Top Applications by Error Volume (total)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "top_app_errors",
+      "description": "Displays applications generating the largest number of errors.",
+      "drilldown": "linkToSearch",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors"
+    },
+    {
+      "title": "Top Applications by Error Volume",
+      "kind": "chart",
+      "visualization": "column",
+      "studio_type": "splunk.column",
+      "use_case": "top_app_errors",
+      "description": "Displays applications generating the largest number of errors.",
+      "drilldown": "linkToSearch",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| sort - errors\n| head 10"
+    },
+    {
+      "title": "Top Applications by Error Volume - Trend",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "top_app_errors",
+      "description": "Displays applications generating the largest number of errors.",
+      "drilldown": "linkToSearch",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| timechart span=1h count"
+    },
+    {
+      "title": "Application Error Trend",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "app_error_trend",
+      "description": "Error volume over time per application.",
+      "drilldown": "linkToSearch",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| timechart span=1h count AS errors BY application limit=10 useother=true"
+    },
+    {
+      "title": "Top Application Exceptions",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "app_exceptions",
+      "description": "Most frequent exception classes per application.",
+      "drilldown": "linkToSearch",
+      "spl": "index=app_logs sourcetype=_json (Exception OR Traceback OR \"stack trace\")\n| rex field=_raw \"(?<exception>[A-Za-z_][\\w.$]*(?:Exception|Error))\\b\"\n| stats count AS occurrences latest(_time) AS last_seen BY application exception\n| sort - occurrences\n| head 10\n| convert ctime(last_seen)"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - Top Applications by Error Volume",
+      "title": "Top Applications by Error Volume",
+      "description": "Displays applications generating the largest number of errors.",
+      "business_description": "Highlights which applications generate the most errors so engineering can prioritise fixes and track release quality.",
+      "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| sort - errors\n| head 10",
+      "schedule": {
+        "cron": "0 7 * * *",
+        "human": "daily at 07:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "column",
+      "saved_search_params": {
+        "search": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| sort - errors\n| head 10",
+        "description": "Displays applications generating the largest number of errors.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "visualizations",
+        "display.page.search.tab": "visualizations",
+        "display.visualizations.type": "charting",
+        "display.visualizations.charting.chart": "column",
+        "cron_schedule": "0 7 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": false,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - Top Applications by Error Volume",
+          "title": "Top Applications by Error Volume",
+          "use_case": "top_app_errors",
+          "spl": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| where errors > 500",
+          "condition": "errors > 500",
+          "threshold": 500.0,
+          "severity": "medium",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [
+              "application"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Open the top error messages for the application.",
+            "Correlate with recent releases."
+          ],
+          "saved_search_params": {
+            "search": "index=app_logs sourcetype=_json level IN (\"ERROR\", \"FATAL\", \"CRITICAL\")\n| stats count AS errors BY application\n| where errors > 500",
+            "description": "Displays applications generating the largest number of errors.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "4",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "application",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[MEDIUM] $name$",
+            "action.email.message.alert": "Splunk alert \"Top Applications by Error Volume\" fired.\n\nCondition : errors > 500\nSeverity  : medium\nSummary   : Displays applications generating the largest number of errors.\n\nRecommended actions:\n- Open the top error messages for the application.\n- Correlate with recent releases.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    }
+  },
+  "warnings": []
+}

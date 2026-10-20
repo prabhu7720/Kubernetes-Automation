@@ -1,0 +1,242 @@
+{
+  "request": "Build an alert for pod restart spikes",
+  "title": "Pod Restart Spikes",
+  "artifact_type": "alert",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Build an alert for pod restart spikes",
+    "artifact_type": "alert",
+    "tokens": [
+      "pod",
+      "restart",
+      "spike"
+    ],
+    "time_range": null,
+    "threshold": null,
+    "comparator": null,
+    "percent": false,
+    "window": null,
+    "status_codes": [],
+    "limit": null,
+    "groupby": null,
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "pod_restarts"
+  ],
+  "alternatives": [
+    "top_pods_restart_count"
+  ],
+  "generated_spl": [
+    {
+      "use_case": "pod_restarts",
+      "title": "Pod Restart Spikes",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+      "adhoc_spl": "index=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "15m",
+      "limit": 10,
+      "groupby": "pod",
+      "datasource": {
+        "profile": "kubernetes_events",
+        "datasets": [
+          {
+            "index": "k8s_events",
+            "sourcetype": "kube:object:events"
+          }
+        ],
+        "base": "index=k8s_events sourcetype=\"kube:object:events\"",
+        "field_map": {
+          "message": "object.message",
+          "namespace": "object.involvedObject.namespace",
+          "object_kind": "object.involvedObject.kind",
+          "pod": "object.involvedObject.name",
+          "reason": "object.reason"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": null,
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'Pod Restart Spikes': Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+        "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, object_kind->object.involvedObject.kind, pod->object.involvedObject.name, reason->object.reason.",
+        "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\").",
+        "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.name."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Use case 'Pod Restart Spikes': Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+    "Datasource 'kubernetes_events' resolved to index=k8s_events sourcetype=\"kube:object:events\" (selected from the discovered catalog, confidence 100%). Field mapping: message->object.message, namespace->object.involvedObject.namespace, object_kind->object.involvedObject.kind, pod->object.involvedObject.name, reason->object.reason.",
+    "Retrieves events from index k8s_events (sourcetype kube:object:events) for -24h to now matching: object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\").",
+    "`timechart` buckets results over time (span 15m) computing count, one series per object.involvedObject.name."
+  ],
+  "visualization": {
+    "primary": "line",
+    "studio_type": "splunk.line",
+    "rationale": "Time-bucketed series are best read as a trend line.",
+    "alternatives": [
+      "area",
+      "column"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "Pod Restart Spikes (total)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "pod_restarts",
+      "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats dc(object.involvedObject.name) AS restarting_pods"
+    },
+    {
+      "title": "Pod Restart Spikes",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "pod_restarts",
+      "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true"
+    },
+    {
+      "title": "CrashLoopBackOff Pods",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "crashloopbackoff",
+      "description": "Pods in CrashLoopBackOff (back-off restarting failed container).",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (object.reason=\"BackOff\" OR \"CrashLoopBackOff\")\n| stats count AS backoffs latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - backoffs\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "OOMKilled Containers",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "oomkilled",
+      "description": "Containers killed for exceeding memory limits and node-level OOM kills.",
+      "drilldown": "linkToSearch",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\")\n| stats count AS oom_events latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - oom_events\n| convert ctime(last_seen)"
+    },
+    {
+      "title": "Top Pods by Restart Count",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "top_pods_restart_count",
+      "description": "Pods with the most container restarts in the period (from k8s.container.restarts metric).",
+      "drilldown": "linkToSearch",
+      "spl": "| mstats max(k8s.container.restarts) AS restarts WHERE index=k8s_metrics span=5m BY k8s.namespace.name k8s.pod.name\n| stats range(restarts) AS restarts_in_window max(restarts) AS total_restarts BY k8s.namespace.name k8s.pod.name\n| where restarts_in_window > 0\n| sort - restarts_in_window\n| head 10"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - Pod Restart Spikes",
+      "title": "Pod Restart Spikes",
+      "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+      "business_description": "Unstable pods degrade availability long before a full outage; early detection protects SLOs.",
+      "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+      "schedule": {
+        "cron": "0 6 * * *",
+        "human": "daily at 06:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "line",
+      "saved_search_params": {
+        "search": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| timechart span=15m count AS restart_signals BY object.involvedObject.name limit=10 useother=true",
+        "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "visualizations",
+        "display.page.search.tab": "visualizations",
+        "display.visualizations.type": "charting",
+        "display.visualizations.charting.chart": "line",
+        "cron_schedule": "0 6 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": true,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - Pod Restart Spikes",
+          "title": "Pod Restart Spikes",
+          "use_case": "pod_restarts",
+          "spl": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count AS restart_signals values(object.reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| where restart_signals > 10",
+          "condition": "restart_signals > 10",
+          "threshold": 10.0,
+          "severity": "high",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [
+              "object.involvedObject.namespace",
+              "object.involvedObject.name"
+            ],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Investigate crash loop: kubectl describe pod / kubectl logs --previous.",
+            "Correlate with recent rollouts (kubectl rollout history).",
+            "Verify resource limits and liveness probe configuration."
+          ],
+          "saved_search_params": {
+            "search": "index=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count AS restart_signals values(object.reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| where restart_signals > 10",
+            "description": "Restart signals (BackOff, Killing, Unhealthy) per pod over time.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "alert.suppress": "1",
+            "alert.suppress.fields": "object.involvedObject.namespace,object.involvedObject.name",
+            "alert.suppress.period": "1h",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"Pod Restart Spikes\" fired.\n\nCondition : restart_signals > 10\nSeverity  : high\nSummary   : Restart signals (BackOff, Killing, Unhealthy) per pod over time.\n\nRecommended actions:\n- Investigate crash loop: kubectl describe pod / kubectl logs --previous.\n- Correlate with recent rollouts (kubectl rollout history).\n- Verify resource limits and liveness probe configuration.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    },
+    "runbook": {
+      "title": "Pod Restart Spikes Runbook",
+      "markdown": "# Pod Restart Spikes Runbook\n\n| Field | Value |\n|---|---|\n| Domain | kubernetes |\n| Severity | High |\n| Trigger | `restart_signals > 10` over 1h |\n| Schedule | 0 * * * * (hourly at :00) |\n| MITRE ATT&CK | n/a |\n\n## 1. Purpose\nRestart signals (BackOff, Killing, Unhealthy) per pod over time.\n\n**Business impact:** Unstable pods degrade availability long before a full outage; early detection protects SLOs.\n\n## 2. Detection logic\n```spl\nindex=k8s_events sourcetype=\"kube:object:events\" object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count AS restart_signals values(object.reason) AS reasons latest(object.message) AS last_message BY object.involvedObject.namespace object.involvedObject.name\n| where restart_signals > 10\n```\n\n## 3. Triage (first 15 minutes)\n1. Identify affected namespace/pod and whether it belongs to a critical service.\n2. Check if a deployment or config change happened shortly before (rollout history).\n3. Determine scope: single pod, whole deployment, or node-wide.\n\n## 4. Investigation searches\n**OOMKilled Containers**\n\n```spl\nindex=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now (\"OOMKilled\" OR object.reason=\"OOMKilling\" OR object.reason=\"SystemOOM\")\n| stats count AS oom_events latest(object.message) AS last_message latest(_time) AS last_seen BY object.involvedObject.namespace object.involvedObject.name\n| sort - oom_events\n| convert ctime(last_seen)\n```\n\n**Liveness / Readiness Probe Failures**\n\n```spl\nindex=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.reason=\"Unhealthy\"\n| eval probe=case(like('object.message', \"Liveness%\"), \"liveness\", like('object.message', \"Readiness%\"), \"readiness\", like('object.message', \"Startup%\"), \"startup\", true(), \"other\")\n| stats count AS failures BY object.involvedObject.namespace object.involvedObject.name probe\n| sort - failures\n| head 10\n```\n\n```spl\nindex=k8s_events sourcetype=\"kube:object:events\" earliest=-24h latest=now object.involvedObject.kind=\"Pod\" object.reason IN (\"BackOff\", \"Killing\", \"Unhealthy\")\n| stats count BY object.involvedObject.namespace object.involvedObject.name object.reason | sort - count\n```\n\n## 5. Remediation\n1. kubectl -n <namespace> describe pod <pod>   # last state, exit code, events\n2. kubectl -n <namespace> logs <pod> --previous   # logs of the crashed container\n3. kubectl -n <namespace> rollout history deploy/<name> && kubectl -n <namespace> rollout undo deploy/<name>\n4. Adjust resources.limits / liveness probe thresholds if OOM or probe related.\n\n### Alert-specific actions\n- Investigate crash loop: kubectl describe pod / kubectl logs --previous.\n- Correlate with recent rollouts (kubectl rollout history).\n- Verify resource limits and liveness probe configuration.\n\n## 6. Escalation\nPage the owning service team if a production namespace is affected for more than 15 minutes.\n\n## 7. References\n- https://kubernetes.io/docs/tasks/debug/debug-application/debug-pods/\n\n## 8. Post-incident\n- Record root cause and timeline in the incident ticket.\n- Tune the threshold / add suppressions if the alert was noisy.\n- Update this runbook with anything that would have helped.\n"
+    }
+  },
+  "warnings": []
+}

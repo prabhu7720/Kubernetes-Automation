@@ -1,0 +1,237 @@
+{
+  "request": "Create alert when HTTP 500 errors exceed 100 per hour",
+  "title": "HTTP Error Responses",
+  "artifact_type": "alert",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Create alert when HTTP 500 errors exceed 100 per hour",
+    "artifact_type": "alert",
+    "tokens": [
+      "http",
+      "500",
+      "error"
+    ],
+    "time_range": null,
+    "threshold": 100.0,
+    "comparator": ">",
+    "percent": false,
+    "window": "1h",
+    "status_codes": [
+      "500"
+    ],
+    "limit": null,
+    "groupby": null,
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "http_status_errors"
+  ],
+  "alternatives": [
+    "app_error_trend",
+    "http_error_rate"
+  ],
+  "generated_spl": [
+    {
+      "use_case": "http_status_errors",
+      "title": "HTTP Error Responses",
+      "spl": "index=web sourcetype=access_combined status IN (500)\n| timechart span=1h count BY status",
+      "adhoc_spl": "index=web sourcetype=access_combined earliest=-24h latest=now status IN (500)\n| timechart span=1h count BY status",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "web",
+        "datasets": [
+          {
+            "index": "web",
+            "sourcetype": "access_combined"
+          }
+        ],
+        "base": "index=web sourcetype=access_combined",
+        "field_map": {
+          "host": "host",
+          "status_code": "status",
+          "uri": "uri"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Web",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'HTTP Error Responses': HTTP responses matching the selected status codes (default 5xx) over time.",
+        "Datasource 'web' resolved to index=web sourcetype=access_combined (selected from the discovered catalog, confidence 100%). Field mapping: status_code->status.",
+        "Retrieves events from index web (sourcetype access_combined) for -24h to now matching: status IN (500).",
+        "`timechart` buckets results over time (span 1h) computing count, one series per status."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Use case 'HTTP Error Responses': HTTP responses matching the selected status codes (default 5xx) over time.",
+    "Datasource 'web' resolved to index=web sourcetype=access_combined (selected from the discovered catalog, confidence 100%). Field mapping: status_code->status.",
+    "Retrieves events from index web (sourcetype access_combined) for -24h to now matching: status IN (500).",
+    "`timechart` buckets results over time (span 1h) computing count, one series per status."
+  ],
+  "visualization": {
+    "primary": "line",
+    "studio_type": "splunk.line",
+    "rationale": "Time-bucketed series are best read as a trend line.",
+    "alternatives": [
+      "area",
+      "column"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "HTTP Error Responses (total)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "http_status_errors",
+      "description": "HTTP responses matching the selected status codes (default 5xx) over time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=web sourcetype=access_combined status IN (500)\n| stats count AS http_errors"
+    },
+    {
+      "title": "HTTP Error Responses",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "http_status_errors",
+      "description": "HTTP responses matching the selected status codes (default 5xx) over time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=web sourcetype=access_combined status IN (500)\n| timechart span=1h count BY status"
+    },
+    {
+      "title": "HTTP Error Rate",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "http_error_rate",
+      "description": "Percentage of 5xx responses per host.",
+      "drilldown": "linkToSearch",
+      "spl": "index=web sourcetype=access_combined status=*\n| stats count AS requests count(eval(tonumber(status) >= 500)) AS server_errors BY host\n| eval error_rate_pct=round(server_errors / requests * 100, 2)\n| where requests >= 20\n| sort - error_rate_pct\n| head 10"
+    },
+    {
+      "title": "Slowest Endpoints",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "slowest_endpoints",
+      "description": "Endpoints ranked by p95 response time.",
+      "drilldown": "linkToSearch",
+      "spl": "index=web sourcetype=access_combined request_time=*\n| stats count AS requests avg(request_time) AS avg_ms perc95(request_time) AS p95_ms BY uri\n| where requests >= 10\n| eval avg_ms=round(avg_ms, 2), p95_ms=round(p95_ms, 2)\n| sort - p95_ms\n| head 10"
+    },
+    {
+      "title": "Request Volume by Status Class",
+      "kind": "chart",
+      "visualization": "area",
+      "studio_type": "splunk.area",
+      "use_case": "request_volume",
+      "description": "Web request throughput split by 2xx/3xx/4xx/5xx.",
+      "drilldown": "linkToSearch",
+      "spl": "index=web sourcetype=access_combined status=*\n| eval status_class=substr(tostring(status), 1, 1) . \"xx\"\n| timechart span=1h count BY status_class"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - HTTP Error Responses",
+      "title": "HTTP Error Responses",
+      "description": "HTTP responses matching the selected status codes (default 5xx) over time.",
+      "business_description": "Server-side errors directly impact customers and revenue; tracking them protects SLAs.",
+      "spl": "index=web sourcetype=access_combined status IN (500)\n| timechart span=1h count BY status",
+      "schedule": {
+        "cron": "0 6 * * *",
+        "human": "daily at 06:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "line",
+      "saved_search_params": {
+        "search": "index=web sourcetype=access_combined status IN (500)\n| timechart span=1h count BY status",
+        "description": "HTTP responses matching the selected status codes (default 5xx) over time.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "visualizations",
+        "display.page.search.tab": "visualizations",
+        "display.visualizations.type": "charting",
+        "display.visualizations.charting.chart": "line",
+        "cron_schedule": "0 6 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": true,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - HTTP Error Responses",
+          "title": "HTTP Error Responses",
+          "use_case": "http_status_errors",
+          "spl": "index=web sourcetype=access_combined status IN (500)\n| stats count AS errors dc(host) AS affected_hosts dc(uri) AS affected_endpoints\n| where errors > 100",
+          "condition": "errors > 100",
+          "threshold": 100.0,
+          "severity": "high",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Identify failing endpoints and hosts.",
+            "Check recent deployments and upstream dependencies.",
+            "Roll back or fail over if the error rate keeps rising."
+          ],
+          "saved_search_params": {
+            "search": "index=web sourcetype=access_combined status IN (500)\n| stats count AS errors dc(host) AS affected_hosts dc(uri) AS affected_endpoints\n| where errors > 100",
+            "description": "HTTP responses matching the selected status codes (default 5xx) over time.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"HTTP Error Responses\" fired.\n\nCondition : errors > 100\nSeverity  : high\nSummary   : HTTP responses matching the selected status codes (default 5xx) over time.\n\nRecommended actions:\n- Identify failing endpoints and hosts.\n- Check recent deployments and upstream dependencies.\n- Roll back or fail over if the error rate keeps rising.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    },
+    "runbook": {
+      "title": "HTTP Error Responses Runbook",
+      "markdown": "# HTTP Error Responses Runbook\n\n| Field | Value |\n|---|---|\n| Domain | application |\n| Severity | High |\n| Trigger | `errors > 100` over 1h |\n| Schedule | 0 * * * * (hourly at :00) |\n| MITRE ATT&CK | n/a |\n\n## 1. Purpose\nHTTP responses matching the selected status codes (default 5xx) over time.\n\n**Business impact:** Server-side errors directly impact customers and revenue; tracking them protects SLAs.\n\n## 2. Detection logic\n```spl\nindex=web sourcetype=access_combined status IN (500)\n| stats count AS errors dc(host) AS affected_hosts dc(uri) AS affected_endpoints\n| where errors > 100\n```\n\n## 3. Triage (first 15 minutes)\n1. Which hosts/endpoints are returning errors and since when?\n2. Did a deployment, config change or dependency incident coincide with the spike?\n\n## 4. Investigation searches\n**Slowest Endpoints**\n\n```spl\nindex=web sourcetype=access_combined earliest=-24h latest=now request_time=*\n| stats count AS requests avg(request_time) AS avg_ms perc95(request_time) AS p95_ms BY uri\n| where requests >= 10\n| eval avg_ms=round(avg_ms, 2), p95_ms=round(p95_ms, 2)\n| sort - p95_ms\n| head 10\n```\n\n**Top Application Exceptions**\n\n```spl\nindex=app_logs sourcetype=_json earliest=-24h latest=now (Exception OR Traceback OR \"stack trace\")\n| rex field=_raw \"(?<exception>[A-Za-z_][\\w.$]*(?:Exception|Error))\\b\"\n| stats count AS occurrences latest(_time) AS last_seen BY application exception\n| sort - occurrences\n| head 10\n| convert ctime(last_seen)\n```\n\n```spl\nindex=web sourcetype=access_combined earliest=-24h latest=now status IN (500)\n| stats count BY uri status | sort - count | head 20\n```\n\n## 5. Remediation\n1. Roll back the most recent release if errors started with it.\n2. Check upstream dependencies (DB, cache, downstream APIs) and connection pools.\n3. Scale out the service if saturation (CPU, threads) is the cause.\n\n### Alert-specific actions\n- Identify failing endpoints and hosts.\n- Check recent deployments and upstream dependencies.\n- Roll back or fail over if the error rate keeps rising.\n\n## 6. Escalation\nPage the service owner when the 5xx rate exceeds the SLO error budget burn rate.\n\n## 7. References\n- n/a\n\n## 8. Post-incident\n- Record root cause and timeline in the incident ticket.\n- Tune the threshold / add suppressions if the alert was noisy.\n- Update this runbook with anything that would have helped.\n"
+    }
+  },
+  "warnings": []
+}

@@ -1,0 +1,21 @@
+[project]
+name = "splunk-agent"
+version = "1.0.0"
+description = "Offline, rule-based Splunk automation agent (SPL, reports, alerts, dashboards, correlation searches, runbooks)"
+requires-python = ">=3.12"
+dependencies = ["splunk-sdk>=2.0.0", "PyYAML>=6.0"]
+
+[project.scripts]
+splunk-agent = "agent:main"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+
+[tool.mypy]
+python_version = "3.12"
+ignore_missing_imports = true

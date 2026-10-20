@@ -1,0 +1,141 @@
+# Logical datasource profiles. The resolver scores discovered (index, sourcetype)
+# pairs against these patterns + field coverage. Use pinned_indexes /
+# pinned_sourcetypes to force an exact mapping for your environment.
+datasources:
+  authentication:
+    description: Authentication events (CIM Authentication)
+    index_patterns: ["auth*", "security", "wineventlog", "windows", "os", "linux*", "okta*", "idp*"]
+    sourcetype_patterns: ["linux_secure", "WinEventLog:Security", "XmlWinEventLog:Security", "*okta*", "duo*",
+                          "radius*", "cisco:ise*", "*:auth*"]
+    default_index: auth
+    default_sourcetype: linux_secure
+    datamodel: Authentication
+  linux_auth:
+    index_patterns: ["os", "linux*", "unix", "nix*", "auth*"]
+    sourcetype_patterns: ["linux_secure", "syslog:auth*"]
+    default_index: os
+    default_sourcetype: linux_secure
+  windows_security:
+    index_patterns: ["wineventlog", "windows*", "win*", "security"]
+    sourcetype_patterns: ["WinEventLog:Security", "XmlWinEventLog:Security", "XmlWinEventLog"]
+    default_index: wineventlog
+    default_sourcetype: "WinEventLog:Security"
+    datamodel: Change
+  endpoint:
+    index_patterns: ["endpoint*", "edr*", "av*", "antivirus", "security"]
+    sourcetype_patterns: ["*symantec*", "*mcafee*", "*crowdstrike*", "*defender*", "*sophos*", "*sentinelone*",
+                          "*trendmicro*", "*malware*"]
+    default_index: endpoint
+    default_sourcetype: "crowdstrike:events:sensor"
+    datamodel: Malware
+  network_traffic:
+    index_patterns: ["firewall*", "network*", "netfw", "pan*", "fw*"]
+    sourcetype_patterns: ["pan:traffic", "cisco:asa", "fortigate_traffic", "*firewall*", "aws:cloudwatchlogs:vpcflow",
+                          "checkpoint*", "juniper*"]
+    default_index: firewall
+    default_sourcetype: "pan:traffic"
+    datamodel: Network_Traffic
+  network_change:
+    index_patterns: ["firewall*", "network*", "netfw", "pan*"]
+    sourcetype_patterns: ["pan:config", "pan:system", "cisco:asa", "fortigate_event", "*config*"]
+    default_index: firewall
+    default_sourcetype: "pan:config"
+    datamodel: Change
+  web:
+    index_patterns: ["web*", "nginx*", "apache*", "iis*", "proxy*", "lb*"]
+    sourcetype_patterns: ["access_combined*", "nginx*access*", "nginx:plus:kv", "apache*access*", "iis",
+                          "ms:iis:*", "aws:elb:accesslogs", "*access*"]
+    default_index: web
+    default_sourcetype: access_combined
+    datamodel: Web
+  app_logs:
+    index_patterns: ["app*", "application*", "*_app", "services*", "microservice*"]
+    sourcetype_patterns: ["_json", "json", "*app*", "log4j", "*service*"]
+    default_index: app_logs
+    default_sourcetype: _json
+  kubernetes_events:
+    index_patterns: ["k8s*", "kube*", "kubernetes*", "*k8s*", "*events*"]
+    sourcetype_patterns: ["kube:object:events", "kube:objects:events", "kube:events", "k8s:events", "*k8s*event*"]
+    default_index: k8s_events
+    default_sourcetype: "kube:object:events"
+    default_fields:          # Splunk OTel Collector (k8sobjects receiver) field names
+      reason: object.reason
+      message: object.message
+      type: object.type
+      object_kind: object.involvedObject.kind
+      object_name: object.involvedObject.name
+      pod: object.involvedObject.name
+      namespace: object.involvedObject.namespace
+  kubernetes_logs:
+    index_patterns: ["k8s*", "kube*", "kubernetes*", "*k8s*"]
+    sourcetype_patterns: ["kube:container:*", "k8s:container:*", "kube:*log*"]
+    default_index: k8s_logs
+    default_sourcetype: "kube:container:*"
+    default_fields:
+      namespace: k8s.namespace.name
+      pod: k8s.pod.name
+      container: k8s.container.name
+      node: k8s.node.name
+  kubernetes_metrics:
+    type: metric
+    index_patterns: ["k8s*metric*", "*metrics*", "em_metrics", "otel*", "k8s_metrics"]
+    default_index: k8s_metrics
+    default_fields:
+      namespace: k8s.namespace.name
+      pod: k8s.pod.name
+      container: k8s.container.name
+      node: k8s.node.name
+  os_cpu:
+    index_patterns: ["os", "nix*", "unix", "linux*", "os_*"]
+    sourcetype_patterns: ["cpu"]
+    default_index: os
+    default_sourcetype: cpu
+  os_memory:
+    index_patterns: ["os", "nix*", "unix", "linux*", "os_*"]
+    sourcetype_patterns: ["vmstat"]
+    default_index: os
+    default_sourcetype: vmstat
+  os_disk:
+    index_patterns: ["os", "nix*", "unix", "linux*", "os_*"]
+    sourcetype_patterns: ["df"]
+    default_index: os
+    default_sourcetype: df
+  syslog:
+    index_patterns: ["os", "nix*", "unix", "linux*", "syslog*"]
+    sourcetype_patterns: ["syslog", "linux_messages_syslog", "linux:syslog*"]
+    default_index: os
+    default_sourcetype: syslog
+  dns:
+    index_patterns: ["dns*", "network*", "infoblox*"]
+    sourcetype_patterns: ["stream:dns", "infoblox:dns", "MSAD:NT6:DNS", "isc:bind:*", "*dns*"]
+    default_index: dns
+    default_sourcetype: "stream:dns"
+    datamodel: Network_Resolution
+  aws_cloudtrail:
+    index_patterns: ["aws*", "cloudtrail*"]
+    sourcetype_patterns: ["aws:cloudtrail"]
+    default_index: aws
+    default_sourcetype: "aws:cloudtrail"
+  azure_signin:
+    index_patterns: ["azure*", "o365*", "msft*", "entra*"]
+    sourcetype_patterns: ["azure:aad:signin", "ms:aad:signin", "azure:monitor:aad"]
+    default_index: azure
+    default_sourcetype: "azure:aad:signin"
+  azure_activity:
+    index_patterns: ["azure*", "msft*"]
+    sourcetype_patterns: ["azure:monitor:activity", "mscs:azure:eventhub", "azure:activity*"]
+    default_index: azure
+    default_sourcetype: "azure:monitor:activity"
+  any:
+    type: any
+    description: All indexes (only used by tstats-based health searches)
+    pinned_indexes: ["*"]
+    default_index: "*"
+
+# Optional enrichments: injected only when a matching lookup exists in the catalog.
+enrichments:
+  threat_intel:
+    lookup_patterns: ["*threat*intel*", "threat_intel*", "*ip_intel*", "*bad_ip*", "*blocklist*", "*ioc*"]
+    input_field: ip
+    event_field: src
+    outputs: [threat_category, threat_source]

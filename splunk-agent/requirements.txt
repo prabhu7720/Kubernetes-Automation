@@ -1,0 +1,3 @@
+# Runtime (install from an internal mirror / wheelhouse for air-gapped hosts)
+splunk-sdk>=2.0.0
+PyYAML>=6.0

@@ -1,0 +1,1463 @@
+{
+  "request": "Create a PCI compliance dashboard",
+  "title": "PCI DSS Compliance Overview",
+  "artifact_type": "dashboard",
+  "confidence": 1.0,
+  "intent": {
+    "text": "Create a PCI compliance dashboard",
+    "artifact_type": "dashboard",
+    "tokens": [
+      "pci",
+      "compliance"
+    ],
+    "time_range": null,
+    "threshold": null,
+    "comparator": null,
+    "percent": false,
+    "window": null,
+    "status_codes": [],
+    "limit": null,
+    "groupby": null,
+    "filters": [],
+    "severity": null,
+    "schedule": null,
+    "title": null
+  },
+  "use_cases": [
+    "pci_failed_access",
+    "pci_audit_log_changes",
+    "pci_account_management",
+    "pci_antivirus_detections",
+    "pci_privileged_activity",
+    "pci_default_accounts",
+    "pci_firewall_changes"
+  ],
+  "alternatives": [],
+  "generated_spl": [
+    {
+      "use_case": "pci_failed_access",
+      "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.4 - Invalid Logical Access Attempts': Failed access attempts to in-scope systems.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+        "`stats` computes count, dc(user) as accounts grouped by dest.",
+        "`sort` orders results by descending failures."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_failed_access",
+      "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.4 - Invalid Logical Access Attempts': Failed access attempts to in-scope systems.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_audit_log_changes",
+      "title": "PCI 10.2.6 - Audit Log Changes",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count AS audit_changes",
+      "adhoc_spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" earliest=-24h latest=now EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count AS audit_changes",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "windows_security",
+        "datasets": [
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "index=wineventlog sourcetype=\"WinEventLog:Security\"",
+        "field_map": {
+          "dest": "dest",
+          "event_code": "EventCode",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.6 - Audit Log Changes': Clearing of audit logs and audit-policy changes.",
+        "Datasource 'windows_security' resolved to index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%). Field mapping: event_code->EventCode.",
+        "Retrieves events from index wineventlog (sourcetype WinEventLog:Security) for -24h to now matching: EventCode IN (1102, 104, 4719, 4906, 4907).",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_account_management",
+      "title": "PCI 8.2 / 10.2.5 - Account Management",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS account_changes",
+      "adhoc_spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" earliest=-24h latest=now EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS account_changes",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "windows_security",
+        "datasets": [
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "index=wineventlog sourcetype=\"WinEventLog:Security\"",
+        "field_map": {
+          "dest": "dest",
+          "event_code": "EventCode",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 8.2 / 10.2.5 - Account Management': Creation, enablement, deletion and modification of accounts.",
+        "Datasource 'windows_security' resolved to index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%). Field mapping: event_code->EventCode.",
+        "Retrieves events from index wineventlog (sourcetype WinEventLog:Security) for -24h to now matching: EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767).",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_antivirus_detections",
+      "title": "PCI 5.2 - Anti-Malware Detections",
+      "spl": "index=endpoint sourcetype=\"symantec:ep:risk:file\" signature=*\n| stats count AS detections",
+      "adhoc_spl": "index=endpoint sourcetype=\"symantec:ep:risk:file\" earliest=-24h latest=now signature=*\n| stats count AS detections",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "endpoint",
+        "datasets": [
+          {
+            "index": "endpoint",
+            "sourcetype": "symantec:ep:risk:file"
+          }
+        ],
+        "base": "index=endpoint sourcetype=\"symantec:ep:risk:file\"",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "signature": "signature"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Malware",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 5.2 - Anti-Malware Detections': Malware detections on in-scope systems.",
+        "Datasource 'endpoint' resolved to index=endpoint sourcetype=\"symantec:ep:risk:file\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index endpoint (sourcetype symantec:ep:risk:file) for -24h to now matching: signature=*.",
+        "`stats` computes count across all matching events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_failed_access",
+      "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.4 - Invalid Logical Access Attempts': Failed access attempts to in-scope systems.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+        "`timechart` buckets results over time (span 1h) computing count."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_account_management",
+      "title": "PCI 8.2 / 10.2.5 - Account Management",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS changes BY EventCode",
+      "adhoc_spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" earliest=-24h latest=now EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS changes BY EventCode",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "windows_security",
+        "datasets": [
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "index=wineventlog sourcetype=\"WinEventLog:Security\"",
+        "field_map": {
+          "dest": "dest",
+          "event_code": "EventCode",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 8.2 / 10.2.5 - Account Management': Creation, enablement, deletion and modification of accounts.",
+        "Datasource 'windows_security' resolved to index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%). Field mapping: event_code->EventCode.",
+        "Retrieves events from index wineventlog (sourcetype WinEventLog:Security) for -24h to now matching: EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767).",
+        "`stats` computes count grouped by EventCode."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_privileged_activity",
+      "title": "PCI 10.2.2 - Administrative Actions",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4672, 4728, 4732, 4756)\n| stats count AS events values(EventCode) AS event_codes BY user dest\n| sort - events",
+      "adhoc_spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" earliest=-24h latest=now EventCode IN (4672, 4728, 4732, 4756)\n| stats count AS events values(EventCode) AS event_codes BY user dest\n| sort - events",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "windows_security",
+        "datasets": [
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "index=wineventlog sourcetype=\"WinEventLog:Security\"",
+        "field_map": {
+          "dest": "dest",
+          "event_code": "EventCode",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.2 - Administrative Actions': Actions taken by accounts with root/administrative privileges.",
+        "Datasource 'windows_security' resolved to index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%). Field mapping: event_code->EventCode.",
+        "Retrieves events from index wineventlog (sourcetype WinEventLog:Security) for -24h to now matching: EventCode IN (4672, 4728, 4732, 4756).",
+        "`stats` computes count, values(EventCode) as event_codes grouped by user dest.",
+        "`sort` orders results by descending events."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_default_accounts",
+      "title": "PCI 2.2.2 - Vendor Default Account Usage",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "src": "src",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 2.2.2 - Vendor Default Account Usage': Successful logins with vendor-default or generic accounts.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\").",
+        "`stats` computes count, values(src) as sources grouped by user dest.",
+        "`sort` orders results by descending logins."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_firewall_changes",
+      "title": "PCI 1.2 - Network Security Control Changes",
+      "spl": "index=firewall sourcetype=\"pan:config\" (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG)\n| stats count AS changes latest(_time) AS last_change BY host user\n| convert ctime(last_change)",
+      "adhoc_spl": "index=firewall sourcetype=\"pan:config\" earliest=-24h latest=now (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG)\n| stats count AS changes latest(_time) AS last_change BY host user\n| convert ctime(last_change)",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "network_change",
+        "datasets": [
+          {
+            "index": "firewall",
+            "sourcetype": "pan:config"
+          }
+        ],
+        "base": "index=firewall sourcetype=\"pan:config\"",
+        "field_map": {
+          "host": "host",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 1.2 - Network Security Control Changes': Firewall / network device configuration changes.",
+        "Datasource 'network_change' resolved to index=firewall sourcetype=\"pan:config\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index firewall (sourcetype pan:config) for -24h to now matching: (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG).",
+        "`stats` computes count, latest(_time) as last_change grouped by host user.",
+        "`convert` formats ctime(last_change) as human-readable time."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_audit_log_changes",
+      "title": "PCI 10.2.6 - Audit Log Changes",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| table _time dest user EventCode\n| sort - _time",
+      "adhoc_spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" earliest=-24h latest=now EventCode IN (1102, 104, 4719, 4906, 4907)\n| table _time dest user EventCode\n| sort - _time",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "windows_security",
+        "datasets": [
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "index=wineventlog sourcetype=\"WinEventLog:Security\"",
+        "field_map": {
+          "dest": "dest",
+          "event_code": "EventCode",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Change",
+        "datamodel_accelerated": false,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.6 - Audit Log Changes': Clearing of audit logs and audit-policy changes.",
+        "Datasource 'windows_security' resolved to index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%). Field mapping: event_code->EventCode.",
+        "Retrieves events from index wineventlog (sourcetype WinEventLog:Security) for -24h to now matching: EventCode IN (1102, 104, 4719, 4906, 4907).",
+        "`table` shows the columns _time dest user EventCode.",
+        "`sort` orders results by descending _time."
+      ],
+      "lint": [],
+      "warnings": []
+    },
+    {
+      "use_case": "pci_failed_access",
+      "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+      "adhoc_spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) earliest=-24h latest=now action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+      "accelerated_spl": null,
+      "earliest": "-24h",
+      "latest": "now",
+      "span": "1h",
+      "limit": 10,
+      "groupby": null,
+      "datasource": {
+        "profile": "authentication",
+        "datasets": [
+          {
+            "index": "auth",
+            "sourcetype": "linux_secure"
+          },
+          {
+            "index": "wineventlog",
+            "sourcetype": "WinEventLog:Security"
+          }
+        ],
+        "base": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\"))",
+        "field_map": {
+          "action": "action",
+          "dest": "dest",
+          "user": "user"
+        },
+        "metric_map": {},
+        "normalization": {},
+        "datamodel": "Authentication",
+        "datamodel_accelerated": true,
+        "origin": "catalog",
+        "confidence": 1.0,
+        "warnings": []
+      },
+      "explanation": [
+        "Use case 'PCI 10.2.4 - Invalid Logical Access Attempts': Failed access attempts to in-scope systems.",
+        "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+        "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+        "`stats` computes count, dc(user) as accounts grouped by dest.",
+        "`sort` orders results by descending failures."
+      ],
+      "lint": [],
+      "warnings": []
+    }
+  ],
+  "explanation": [
+    "Dashboard blueprint 'pci_compliance' selected with 11 panels; panels share a global time picker.",
+    "Use case 'PCI 10.2.4 - Invalid Logical Access Attempts': Failed access attempts to in-scope systems.",
+    "Datasource 'authentication' resolved to index=auth sourcetype=linux_secure; index=wineventlog sourcetype=\"WinEventLog:Security\" (selected from the discovered catalog, confidence 100%).",
+    "Retrieves events from index auth, wineventlog (sourcetype linux_secure, WinEventLog:Security) for -24h to now matching: ( action IN (\"failure\", \"failed\", \"fail\").",
+    "`stats` computes count, dc(user) as accounts grouped by dest.",
+    "`sort` orders results by descending failures."
+  ],
+  "visualization": {
+    "primary": "table",
+    "studio_type": "splunk.table",
+    "rationale": "Rule pack recommends table. Shape analysis: One category with one measure - ranked column chart.",
+    "alternatives": [
+      "column",
+      "bar",
+      "pie"
+    ]
+  },
+  "dashboard_components": [
+    {
+      "title": "Failed Access Attempts (10.2.4)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "pci_failed_access",
+      "description": "Failed access attempts to in-scope systems.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures"
+    },
+    {
+      "title": "Audit Log Changes (10.2.6)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "pci_audit_log_changes",
+      "description": "Clearing of audit logs and audit-policy changes.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count AS audit_changes"
+    },
+    {
+      "title": "Account Changes (8.2)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "pci_account_management",
+      "description": "Creation, enablement, deletion and modification of accounts.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS account_changes"
+    },
+    {
+      "title": "Malware Detections (5.2)",
+      "kind": "kpi",
+      "visualization": "single",
+      "studio_type": "splunk.singlevalue",
+      "use_case": "pci_antivirus_detections",
+      "description": "Malware detections on in-scope systems.",
+      "drilldown": "linkToSearch",
+      "spl": "index=endpoint sourcetype=\"symantec:ep:risk:file\" signature=*\n| stats count AS detections"
+    },
+    {
+      "title": "Failed Access Trend",
+      "kind": "chart",
+      "visualization": "line",
+      "studio_type": "splunk.line",
+      "use_case": "pci_failed_access",
+      "description": "Failed access attempts to in-scope systems.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures"
+    },
+    {
+      "title": "Account Changes by Event Code",
+      "kind": "chart",
+      "visualization": "column",
+      "studio_type": "splunk.column",
+      "use_case": "pci_account_management",
+      "description": "Creation, enablement, deletion and modification of accounts.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS changes BY EventCode"
+    },
+    {
+      "title": "Administrative Actions (10.2.2)",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "pci_privileged_activity",
+      "description": "Actions taken by accounts with root/administrative privileges.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4672, 4728, 4732, 4756)\n| stats count AS events values(EventCode) AS event_codes BY user dest\n| sort - events"
+    },
+    {
+      "title": "Default Account Usage (2.2.2)",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "pci_default_accounts",
+      "description": "Successful logins with vendor-default or generic accounts.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins"
+    },
+    {
+      "title": "Network Control Changes (1.2)",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "pci_firewall_changes",
+      "description": "Firewall / network device configuration changes.",
+      "drilldown": "linkToSearch",
+      "spl": "index=firewall sourcetype=\"pan:config\" (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG)\n| stats count AS changes latest(_time) AS last_change BY host user\n| convert ctime(last_change)"
+    },
+    {
+      "title": "Audit Log Change Details",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "pci_audit_log_changes",
+      "description": "Clearing of audit logs and audit-policy changes.",
+      "drilldown": "linkToSearch",
+      "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| table _time dest user EventCode\n| sort - _time"
+    },
+    {
+      "title": "Failed Access by System",
+      "kind": "table",
+      "visualization": "table",
+      "studio_type": "splunk.table",
+      "use_case": "pci_failed_access",
+      "description": "Failed access attempts to in-scope systems.",
+      "drilldown": "linkToSearch",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures"
+    }
+  ],
+  "artifacts": {
+    "report": {
+      "name": "AUTO - Report - PCI 10.2.4 - Invalid Logical Access Attempts",
+      "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+      "description": "Failed access attempts to in-scope systems.",
+      "business_description": "PCI 10.2.4 - Invalid Logical Access Attempts provides PCI DSS evidence for assessors (QSA): Failed access attempts to in-scope systems.",
+      "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+      "schedule": {
+        "cron": "0 6 * * *",
+        "human": "daily at 06:00"
+      },
+      "time_range": {
+        "earliest": "-24h",
+        "latest": "now"
+      },
+      "visualization": "table",
+      "saved_search_params": {
+        "search": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+        "description": "Failed access attempts to in-scope systems.",
+        "dispatch.earliest_time": "-24h",
+        "dispatch.latest_time": "now",
+        "is_scheduled": "1",
+        "request.ui_dispatch_app": "search",
+        "request.ui_dispatch_view": "search",
+        "display.general.type": "statistics",
+        "display.page.search.tab": "statistics",
+        "cron_schedule": "0 6 * * *",
+        "schedule_window": "auto"
+      }
+    },
+    "alert": {
+      "primary": false,
+      "alerts": [
+        {
+          "name": "AUTO - Alert - PCI 10.2.4 - Invalid Logical Access Attempts",
+          "title": "PCI 10.2.4 - Invalid Logical Access Attempts",
+          "use_case": "pci_failed_access",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures\n| where failures > 25",
+          "condition": "failures > 25",
+          "threshold": 25.0,
+          "severity": "medium",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Review the matching results and confirm the condition is genuine.",
+            "Identify the owning team / asset and notify them.",
+            "Document findings and tune the threshold if this is noise."
+          ],
+          "saved_search_params": {
+            "search": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures\n| where failures > 25",
+            "description": "Failed access attempts to in-scope systems.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "4",
+            "alert.digest_mode": "1",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[MEDIUM] $name$",
+            "action.email.message.alert": "Splunk alert \"PCI 10.2.4 - Invalid Logical Access Attempts\" fired.\n\nCondition : failures > 25\nSeverity  : medium\nSummary   : Failed access attempts to in-scope systems.\n\nRecommended actions:\n- Review the matching results and confirm the condition is genuine.\n- Identify the owning team / asset and notify them.\n- Document findings and tune the threshold if this is noise.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - PCI 10.2.6 - Audit Log Changes",
+          "title": "PCI 10.2.6 - Audit Log Changes",
+          "use_case": "pci_audit_log_changes",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count BY dest user EventCode\n| where count > 0",
+          "condition": "count > 0",
+          "threshold": 0.0,
+          "severity": "critical",
+          "window": "15m",
+          "cron": "*/15 * * * *",
+          "schedule": "every 15 minutes",
+          "time_range": {
+            "earliest": "-15m@m",
+            "latest": "@m"
+          },
+          "throttle": {
+            "fields": [],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Review the matching results and confirm the condition is genuine.",
+            "Identify the owning team / asset and notify them.",
+            "Document findings and tune the threshold if this is noise."
+          ],
+          "saved_search_params": {
+            "search": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count BY dest user EventCode\n| where count > 0",
+            "description": "Clearing of audit logs and audit-policy changes.",
+            "is_scheduled": "1",
+            "cron_schedule": "*/15 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-15m@m",
+            "dispatch.latest_time": "@m",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "6",
+            "alert.digest_mode": "1",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[CRITICAL] $name$",
+            "action.email.message.alert": "Splunk alert \"PCI 10.2.6 - Audit Log Changes\" fired.\n\nCondition : count > 0\nSeverity  : critical\nSummary   : Clearing of audit logs and audit-policy changes.\n\nRecommended actions:\n- Review the matching results and confirm the condition is genuine.\n- Identify the owning team / asset and notify them.\n- Document findings and tune the threshold if this is noise.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        },
+        {
+          "name": "AUTO - Alert - PCI 2.2.2 - Vendor Default Account Usage",
+          "title": "PCI 2.2.2 - Vendor Default Account Usage",
+          "use_case": "pci_default_accounts",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins\n| where logins > 0",
+          "condition": "logins > 0",
+          "threshold": 0.0,
+          "severity": "high",
+          "window": "1h",
+          "cron": "0 * * * *",
+          "schedule": "hourly at :00",
+          "time_range": {
+            "earliest": "-1h@h",
+            "latest": "@h"
+          },
+          "throttle": {
+            "fields": [],
+            "period": "1h"
+          },
+          "recommended_actions": [
+            "Review the matching results and confirm the condition is genuine.",
+            "Identify the owning team / asset and notify them.",
+            "Document findings and tune the threshold if this is noise."
+          ],
+          "saved_search_params": {
+            "search": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins\n| where logins > 0",
+            "description": "Successful logins with vendor-default or generic accounts.",
+            "is_scheduled": "1",
+            "cron_schedule": "0 * * * *",
+            "schedule_window": "auto",
+            "dispatch.earliest_time": "-1h@h",
+            "dispatch.latest_time": "@h",
+            "alert_type": "number of events",
+            "alert_comparator": "greater than",
+            "alert_threshold": "0",
+            "alert.track": "1",
+            "alert.severity": "5",
+            "alert.digest_mode": "1",
+            "action.email.to": "${SPLUNK_AGENT_ALERT_EMAIL:-}",
+            "action.email.subject": "[HIGH] $name$",
+            "action.email.message.alert": "Splunk alert \"PCI 2.2.2 - Vendor Default Account Usage\" fired.\n\nCondition : logins > 0\nSeverity  : high\nSummary   : Successful logins with vendor-default or generic accounts.\n\nRecommended actions:\n- Review the matching results and confirm the condition is genuine.\n- Identify the owning team / asset and notify them.\n- Document findings and tune the threshold if this is noise.\n\nResults: $results.link$\n",
+            "action.email.inline": "1",
+            "action.email.sendresults": "1",
+            "action.webhook.param.url": "${SPLUNK_AGENT_ALERT_WEBHOOK:-}",
+            "actions": "email,webhook"
+          }
+        }
+      ]
+    },
+    "dashboard": {
+      "name": "auto_pci_dss_compliance_overview",
+      "title": "PCI DSS Compliance Overview",
+      "panels": [
+        {
+          "title": "Failed Access Attempts (10.2.4)",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "pci_failed_access",
+          "description": "Failed access attempts to in-scope systems.",
+          "drilldown": "linkToSearch",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures"
+        },
+        {
+          "title": "Audit Log Changes (10.2.6)",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "pci_audit_log_changes",
+          "description": "Clearing of audit logs and audit-policy changes.",
+          "drilldown": "linkToSearch",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count AS audit_changes"
+        },
+        {
+          "title": "Account Changes (8.2)",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "pci_account_management",
+          "description": "Creation, enablement, deletion and modification of accounts.",
+          "drilldown": "linkToSearch",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS account_changes"
+        },
+        {
+          "title": "Malware Detections (5.2)",
+          "kind": "kpi",
+          "visualization": "single",
+          "studio_type": "splunk.singlevalue",
+          "use_case": "pci_antivirus_detections",
+          "description": "Malware detections on in-scope systems.",
+          "drilldown": "linkToSearch",
+          "spl": "index=endpoint sourcetype=\"symantec:ep:risk:file\" signature=*\n| stats count AS detections"
+        },
+        {
+          "title": "Failed Access Trend",
+          "kind": "chart",
+          "visualization": "line",
+          "studio_type": "splunk.line",
+          "use_case": "pci_failed_access",
+          "description": "Failed access attempts to in-scope systems.",
+          "drilldown": "linkToSearch",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures"
+        },
+        {
+          "title": "Account Changes by Event Code",
+          "kind": "chart",
+          "visualization": "column",
+          "studio_type": "splunk.column",
+          "use_case": "pci_account_management",
+          "description": "Creation, enablement, deletion and modification of accounts.",
+          "drilldown": "linkToSearch",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS changes BY EventCode"
+        },
+        {
+          "title": "Administrative Actions (10.2.2)",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "pci_privileged_activity",
+          "description": "Actions taken by accounts with root/administrative privileges.",
+          "drilldown": "linkToSearch",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4672, 4728, 4732, 4756)\n| stats count AS events values(EventCode) AS event_codes BY user dest\n| sort - events"
+        },
+        {
+          "title": "Default Account Usage (2.2.2)",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "pci_default_accounts",
+          "description": "Successful logins with vendor-default or generic accounts.",
+          "drilldown": "linkToSearch",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins"
+        },
+        {
+          "title": "Network Control Changes (1.2)",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "pci_firewall_changes",
+          "description": "Firewall / network device configuration changes.",
+          "drilldown": "linkToSearch",
+          "spl": "index=firewall sourcetype=\"pan:config\" (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG)\n| stats count AS changes latest(_time) AS last_change BY host user\n| convert ctime(last_change)"
+        },
+        {
+          "title": "Audit Log Change Details",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "pci_audit_log_changes",
+          "description": "Clearing of audit logs and audit-policy changes.",
+          "drilldown": "linkToSearch",
+          "spl": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| table _time dest user EventCode\n| sort - _time"
+        },
+        {
+          "title": "Failed Access by System",
+          "kind": "table",
+          "visualization": "table",
+          "studio_type": "splunk.table",
+          "use_case": "pci_failed_access",
+          "description": "Failed access attempts to in-scope systems.",
+          "drilldown": "linkToSearch",
+          "spl": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures"
+        }
+      ],
+      "definition": {
+        "title": "PCI DSS Compliance Overview",
+        "description": "Requirement-mapped evidence for PCI DSS 1, 2, 5, 8 and 10.",
+        "inputs": {
+          "input_global_trp": {
+            "type": "input.timerange",
+            "title": "Time Range",
+            "options": {
+              "token": "global_time",
+              "defaultValue": "-24h@h,now"
+            }
+          }
+        },
+        "defaults": {
+          "dataSources": {
+            "ds.search": {
+              "options": {
+                "queryParameters": {
+                  "earliest": "$global_time.earliest$",
+                  "latest": "$global_time.latest$"
+                }
+              }
+            }
+          }
+        },
+        "visualizations": {
+          "viz_failed_access_attempts_10_2_4": {
+            "type": "splunk.singlevalue",
+            "title": "Failed Access Attempts (10.2.4)",
+            "description": "Failed access attempts to in-scope systems.",
+            "dataSources": {
+              "primary": "ds_failed_access_attempts_10_2_4"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_audit_log_changes_10_2_6": {
+            "type": "splunk.singlevalue",
+            "title": "Audit Log Changes (10.2.6)",
+            "description": "Clearing of audit logs and audit-policy changes.",
+            "dataSources": {
+              "primary": "ds_audit_log_changes_10_2_6"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_account_changes_8_2": {
+            "type": "splunk.singlevalue",
+            "title": "Account Changes (8.2)",
+            "description": "Creation, enablement, deletion and modification of accounts.",
+            "dataSources": {
+              "primary": "ds_account_changes_8_2"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_malware_detections_5_2": {
+            "type": "splunk.singlevalue",
+            "title": "Malware Detections (5.2)",
+            "description": "Malware detections on in-scope systems.",
+            "dataSources": {
+              "primary": "ds_malware_detections_5_2"
+            },
+            "options": {
+              "majorValueSize": 36,
+              "trendDisplay": "off",
+              "sparklineDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_failed_access_trend": {
+            "type": "splunk.line",
+            "title": "Failed Access Trend",
+            "description": "Failed access attempts to in-scope systems.",
+            "dataSources": {
+              "primary": "ds_failed_access_trend"
+            },
+            "options": {
+              "legendDisplay": "right",
+              "nullValueDisplay": "zero"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_account_changes_by_event_code": {
+            "type": "splunk.column",
+            "title": "Account Changes by Event Code",
+            "description": "Creation, enablement, deletion and modification of accounts.",
+            "dataSources": {
+              "primary": "ds_account_changes_by_event_code"
+            },
+            "options": {
+              "legendDisplay": "off",
+              "dataValuesDisplay": "off"
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_administrative_actions_10_2_2": {
+            "type": "splunk.table",
+            "title": "Administrative Actions (10.2.2)",
+            "description": "Actions taken by accounts with root/administrative privileges.",
+            "dataSources": {
+              "primary": "ds_administrative_actions_10_2_2"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_default_account_usage_2_2_2": {
+            "type": "splunk.table",
+            "title": "Default Account Usage (2.2.2)",
+            "description": "Successful logins with vendor-default or generic accounts.",
+            "dataSources": {
+              "primary": "ds_default_account_usage_2_2_2"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_network_control_changes_1_2": {
+            "type": "splunk.table",
+            "title": "Network Control Changes (1.2)",
+            "description": "Firewall / network device configuration changes.",
+            "dataSources": {
+              "primary": "ds_network_control_changes_1_2"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_audit_log_change_details": {
+            "type": "splunk.table",
+            "title": "Audit Log Change Details",
+            "description": "Clearing of audit logs and audit-policy changes.",
+            "dataSources": {
+              "primary": "ds_audit_log_change_details"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          },
+          "viz_failed_access_by_system": {
+            "type": "splunk.table",
+            "title": "Failed Access by System",
+            "description": "Failed access attempts to in-scope systems.",
+            "dataSources": {
+              "primary": "ds_failed_access_by_system"
+            },
+            "options": {
+              "count": 10
+            },
+            "eventHandlers": [
+              {
+                "type": "drilldown.linkToSearch",
+                "options": {
+                  "type": "auto",
+                  "newTab": true
+                }
+              }
+            ]
+          }
+        },
+        "dataSources": {
+          "ds_failed_access_attempts_10_2_4": {
+            "type": "ds.search",
+            "name": "Failed Access Attempts (10.2.4)",
+            "options": {
+              "query": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures",
+              "enableSmartSources": true
+            }
+          },
+          "ds_audit_log_changes_10_2_6": {
+            "type": "ds.search",
+            "name": "Audit Log Changes (10.2.6)",
+            "options": {
+              "query": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| stats count AS audit_changes",
+              "enableSmartSources": true
+            }
+          },
+          "ds_account_changes_8_2": {
+            "type": "ds.search",
+            "name": "Account Changes (8.2)",
+            "options": {
+              "query": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS account_changes",
+              "enableSmartSources": true
+            }
+          },
+          "ds_malware_detections_5_2": {
+            "type": "ds.search",
+            "name": "Malware Detections (5.2)",
+            "options": {
+              "query": "index=endpoint sourcetype=\"symantec:ep:risk:file\" signature=*\n| stats count AS detections",
+              "enableSmartSources": true
+            }
+          },
+          "ds_failed_access_trend": {
+            "type": "ds.search",
+            "name": "Failed Access Trend",
+            "options": {
+              "query": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| timechart span=1h count AS failures",
+              "enableSmartSources": true
+            }
+          },
+          "ds_account_changes_by_event_code": {
+            "type": "ds.search",
+            "name": "Account Changes by Event Code",
+            "options": {
+              "query": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4720, 4722, 4724, 4725, 4726, 4738, 4740, 4767)\n| stats count AS changes BY EventCode",
+              "enableSmartSources": true
+            }
+          },
+          "ds_administrative_actions_10_2_2": {
+            "type": "ds.search",
+            "name": "Administrative Actions (10.2.2)",
+            "options": {
+              "query": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (4672, 4728, 4732, 4756)\n| stats count AS events values(EventCode) AS event_codes BY user dest\n| sort - events",
+              "enableSmartSources": true
+            }
+          },
+          "ds_default_account_usage_2_2_2": {
+            "type": "ds.search",
+            "name": "Default Account Usage (2.2.2)",
+            "options": {
+              "query": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action=\"success\" user IN (\"admin\", \"administrator\", \"root\", \"guest\", \"sa\", \"default\", \"test\")\n| stats count AS logins values(src) AS sources BY user dest\n| sort - logins",
+              "enableSmartSources": true
+            }
+          },
+          "ds_network_control_changes_1_2": {
+            "type": "ds.search",
+            "name": "Network Control Changes (1.2)",
+            "options": {
+              "query": "index=firewall sourcetype=\"pan:config\" (\"configuration change\" OR \"config change\" OR \"%ASA-5-111008\" OR \"%ASA-5-111010\" OR type=CONFIG)\n| stats count AS changes latest(_time) AS last_change BY host user\n| convert ctime(last_change)",
+              "enableSmartSources": true
+            }
+          },
+          "ds_audit_log_change_details": {
+            "type": "ds.search",
+            "name": "Audit Log Change Details",
+            "options": {
+              "query": "index=wineventlog sourcetype=\"WinEventLog:Security\" EventCode IN (1102, 104, 4719, 4906, 4907)\n| table _time dest user EventCode\n| sort - _time",
+              "enableSmartSources": true
+            }
+          },
+          "ds_failed_access_by_system": {
+            "type": "ds.search",
+            "name": "Failed Access by System",
+            "options": {
+              "query": "((index=auth sourcetype=linux_secure) OR (index=wineventlog sourcetype=\"WinEventLog:Security\")) action IN (\"failure\", \"failed\", \"fail\")\n| stats count AS failures dc(user) AS accounts BY dest\n| sort - failures",
+              "enableSmartSources": true
+            }
+          }
+        },
+        "layout": {
+          "type": "absolute",
+          "options": {
+            "width": 1440,
+            "height": 2310,
+            "display": "auto-scale"
+          },
+          "structure": [
+            {
+              "item": "viz_failed_access_attempts_10_2_4",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_audit_log_changes_10_2_6",
+              "type": "block",
+              "position": {
+                "x": 360,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_account_changes_8_2",
+              "type": "block",
+              "position": {
+                "x": 720,
+                "y": 0,
+                "w": 350,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_malware_detections_5_2",
+              "type": "block",
+              "position": {
+                "x": 1080,
+                "y": 0,
+                "w": 360,
+                "h": 120
+              }
+            },
+            {
+              "item": "viz_failed_access_trend",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 130,
+                "w": 710,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_account_changes_by_event_code",
+              "type": "block",
+              "position": {
+                "x": 720,
+                "y": 130,
+                "w": 720,
+                "h": 320
+              }
+            },
+            {
+              "item": "viz_administrative_actions_10_2_2",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 460,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_default_account_usage_2_2_2",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 830,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_network_control_changes_1_2",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1200,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_audit_log_change_details",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1570,
+                "w": 1440,
+                "h": 360
+              }
+            },
+            {
+              "item": "viz_failed_access_by_system",
+              "type": "block",
+              "position": {
+                "x": 0,
+                "y": 1940,
+                "w": 1440,
+                "h": 360
+              }
+            }
+          ],
+          "globalInputs": [
+            "input_global_trp"
+          ]
+        }
+      }
+    }
+  },
+  "warnings": []
+}
