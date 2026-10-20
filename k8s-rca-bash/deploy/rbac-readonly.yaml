@@ -1,0 +1,51 @@
+# Read-only identity for the Kubernetes Diagnostic Agent.
+# Bind it to the user/group/SA your kubeconfig authenticates as:
+#   kubectl apply -f deploy/rbac-readonly.yaml
+#   (edit the ClusterRoleBinding subject first)
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: k8s-diagnostic-agent-readonly
+rules:
+- apiGroups: [""]
+  resources: [pods, pods/log, events, nodes, namespaces, persistentvolumeclaims,
+              persistentvolumes, serviceaccounts, resourcequotas, limitranges,
+              configmaps, services, endpoints]
+  verbs: [get, list]
+# Secret NAMES only: the agent uses the server-side table printer and never
+# reads secret data, but Kubernetes RBAC cannot grant "list names only".
+# Remove this rule if you prefer; the missing-secret rule is then skipped.
+- apiGroups: [""]
+  resources: [secrets]
+  verbs: [list]
+- apiGroups: [apps]
+  resources: [deployments, replicasets, statefulsets, daemonsets]
+  verbs: [get, list]
+- apiGroups: [batch]
+  resources: [jobs, cronjobs]
+  verbs: [get, list]
+- apiGroups: [autoscaling]
+  resources: [horizontalpodautoscalers]
+  verbs: [get, list]
+- apiGroups: [storage.k8s.io]
+  resources: [storageclasses, volumeattachments]
+  verbs: [get, list]
+- apiGroups: [metrics.k8s.io]
+  resources: [pods, nodes]
+  verbs: [get, list]
+- apiGroups: [cert-manager.io]
+  resources: [certificates, certificaterequests]
+  verbs: [get, list]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: k8s-diagnostic-agent-readonly
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: k8s-diagnostic-agent-readonly
+subjects:
+- kind: Group            # or User / ServiceAccount
+  name: sre-diagnostics  # <-- change me
+  apiGroup: rbac.authorization.k8s.io
