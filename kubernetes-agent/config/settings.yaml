@@ -1,0 +1,40 @@
+# Kubernetes Diagnostic Agent - default settings
+# Override with --config <file> or the K8S_AGENT_CONFIG environment variable.
+
+# ---------------- collection ----------------
+log_tail_lines: 500          # lines fetched per container (current + previous)
+log_limit_bytes: 2000000     # hard cap per log fetch
+request_timeout: 30          # seconds, passed to kubectl --request-timeout
+collect_logs: true
+collect_metrics: true        # uses metrics-server via `kubectl top` when available
+workers: 4                   # parallel pod analyses in namespace/cluster mode
+
+# ---------------- triage ----------------
+restart_threshold: 3         # restarts at/above this mark a pod unhealthy
+max_pods_per_deployment: 5
+max_pods_per_namespace: 25
+max_pods_cluster: 40
+
+# ---------------- rule thresholds ----------------
+node_allocation_warn_pct: 90
+memory_usage_warn_pct: 90
+cpu_usage_warn_pct: 90
+quota_warn_pct: 90
+cert_expiry_warn_days: 14
+
+# ---------------- reporting ----------------
+min_confidence: 0
+max_evidence_lines: 5        # max log lines quoted per finding
+redact_patterns: []          # extra regexes to scrub from evidence, e.g. '\bACME-[0-9]{6}\b'
+
+# ---------------- rules ----------------
+disabled_rules: []           # e.g. [K8S-RES-001]
+extra_rule_dirs: []          # directories with additional *.py rule files (relative to project root or absolute)
+rule_overrides: {}
+#  K8S-NET-002:
+#    severity: medium
+#    patterns:
+#      log: ['upstream connect error']
+
+# ---------------- safety ----------------
+block_network_egress: true   # block any outbound socket from the Python process

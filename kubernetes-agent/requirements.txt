@@ -1,0 +1,5 @@
+# Runtime: Python 3.9+ standard library + the kubectl binary on PATH.
+# Optional - only needed to read YAML config files (defaults are built in):
+PyYAML>=6.0
+# Development / tests:
+pytest>=7.0
