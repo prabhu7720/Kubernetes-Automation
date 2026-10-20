@@ -1,0 +1,264 @@
+{
+  "release": "1.0",
+  "dialect": "mssql",
+  "profile": "mssql",
+  "sources": [
+    "samples/mssql/release.sql"
+  ],
+  "overall_risk": "MEDIUM",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "FAIL",
+      "detail": "2 finding(s)"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = agent"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "WARN",
+      "detail": "1 finding(s)"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_TABLE",
+      "object": "dbo.Invoice",
+      "impact": "Creates table dbo.Invoice with 4 column(s); primary key PK_Invoice (InvoiceId). New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE dbo.Invoice"
+      ],
+      "source": "samples/mssql/release.sql:1"
+    },
+    {
+      "seq": 2,
+      "kind": "CREATE_INDEX",
+      "object": "dbo.IX_Invoice_Customer",
+      "impact": "Creates index dbo.IX_Invoice_Customer on dbo.Invoice (CustomerId). Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX IX_Invoice_Customer ON dbo.Invoice"
+      ],
+      "source": "samples/mssql/release.sql:9"
+    },
+    {
+      "seq": 3,
+      "kind": "ADD_COLUMN",
+      "object": "dbo.Invoice",
+      "impact": "Adds column(s) Notes NVARCHAR(MAX) to dbo.Invoice.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE dbo.Invoice DROP COLUMN Notes"
+      ],
+      "source": "samples/mssql/release.sql:11"
+    },
+    {
+      "seq": 4,
+      "kind": "CREATE_PROCEDURE",
+      "object": "dbo.usp_GetInvoices",
+      "impact": "Creates procedure dbo.usp_GetInvoices; touches dbo.Invoice.",
+      "rollback_complete": false,
+      "rollback_sql": [
+        "-- MANUAL: restore the previous definition of dbo.usp_GetInvoices (definition captured by the pre-check) or DROP PROCEDURE dbo.usp_GetInvoices if the object is new"
+      ],
+      "source": "samples/mssql/release.sql:13"
+    },
+    {
+      "seq": 5,
+      "kind": "CREATE_TRIGGER",
+      "object": "dbo.trg_Invoice_Audit",
+      "impact": "Creates AFTER UPDATE statement-level trigger dbo.trg_Invoice_Audit on Invoice. Fires on every update against Invoice.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER dbo.trg_Invoice_Audit"
+      ],
+      "source": "samples/mssql/release.sql:21"
+    },
+    {
+      "seq": 6,
+      "kind": "UPDATE",
+      "object": "dbo.Invoice",
+      "impact": "Updates dbo.Invoice - rows matching: Amount < 0.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "MERGE INTO dbo.Invoice t USING dbo.INVOICE_BKP6 b ON (t.InvoiceId = b.InvoiceId) WHEN MATCHED THEN UPDATE SET t.Amount = b.Amount"
+      ],
+      "source": "samples/mssql/release.sql:27"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "001",
+      "comment": "Create table dbo.Invoice",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "comment": "Create index IX_Invoice_Customer on Invoice",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "comment": "Add column(s) to dbo.Invoice",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "comment": "Create or replace procedure dbo.usp_GetInvoices",
+      "rollback_complete": false
+    },
+    {
+      "id": "005",
+      "comment": "Create trigger dbo.trg_Invoice_Audit",
+      "rollback_complete": true
+    },
+    {
+      "id": "006",
+      "comment": "Backup rows of dbo.Invoice before update",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "comment": "Data: update dbo.Invoice",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "001",
+      "file": "01_APP_DBO_INVOICE_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "file": "02_APP_DBO_INVOICE_ADD_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "file": "03_APP_DBO_USP_GETINVOICES_PROC_DDL.sql",
+      "rollback_complete": false
+    },
+    {
+      "id": "004",
+      "file": "04_APP_DBO_INVOICE_AUDIT_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "file": "05_APP_DBO_INVOICE_DML.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[xml] changeSet 004: rollback is incomplete / manual. ",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "004"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[formatted-sql] changeSet 003: rollback is incomplete / manual. CREATE OR REPLACE dbo.usp_GetInvoices without --baseline: the agent cannot know whether a previous version exists, so it will not generate a DROP that could delete a live object.",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "03_APP_DBO_USP_GETINVOICES_PROC_DDL.sql"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "REPLACE_UNKNOWN",
+      "message": "CREATE OR REPLACE usp_GetInvoices without baseline - rollback defaults to DROP.",
+      "recommendation": "Provide the current source if it already exists.",
+      "category": "risk",
+      "location": "samples/mssql/release.sql:13"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UPDATE_DATA",
+      "message": "UPDATE overwrites Amount on dbo.Invoice; previous values are needed for rollback.",
+      "recommendation": "Back up affected PK + columns before deploy, or accept forward-fix only.",
+      "category": "risk",
+      "location": "samples/mssql/release.sql:27"
+    },
+    {
+      "severity": "LOW",
+      "code": "TRIGGER_WRITES",
+      "message": "Trigger writes to another table (audit pattern); that table's growth/purge policy must be defined.",
+      "recommendation": "Add a retention/purge job for audit rows.",
+      "category": "risk",
+      "location": "samples/mssql/release.sql:21"
+    },
+    {
+      "severity": "LOW",
+      "code": "DML_LOCKS",
+      "message": "Row locks held on dbo.Invoice until COMMIT; long-running DML blocks OLTP.",
+      "recommendation": "Keep DML in its own changeSet; size undo; run off-peak.",
+      "category": "risk",
+      "location": "samples/mssql/release.sql:27"
+    },
+    {
+      "severity": "LOW",
+      "code": "ENV_HARDCODED_SCHEMA",
+      "message": "Schema 'DBO' is hard-coded 9 time(s).",
+      "recommendation": "For environment independence use a changelog property, e.g. <property name=\"schema\" value=\"DBO\"/> and ${schema}.OBJECT, or rely on the connection's default schema (liquibase.defaultSchemaName).",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "samples/mssql/release.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

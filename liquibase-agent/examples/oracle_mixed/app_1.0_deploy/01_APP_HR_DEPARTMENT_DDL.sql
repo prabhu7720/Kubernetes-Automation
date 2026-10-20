@@ -1,0 +1,25 @@
+--liquibase formatted sql
+
+--changeset agent:001
+--comment: Create Sequence, Create Table - SEQ_DEPARTMENT_ID, DEPARTMENT
+
+-- =====================================================
+-- Example Oracle release script with typical mixed content
+-- =====================================================
+CREATE SEQUENCE HR.SEQ_DEPARTMENT_ID START WITH 1 INCREMENT BY 1 CACHE 20 NOCYCLE;
+
+CREATE TABLE HR.DEPARTMENT (
+   DEPARTMENT_ID   NUMBER        NOT NULL,
+   DEPT_CODE       VARCHAR2(10)  NOT NULL,
+   DEPT_NAME       VARCHAR2(100) NOT NULL,
+   MANAGER_ID      NUMBER,
+   CREATED_DT      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+   CREATED_BY      VARCHAR2(30),
+   UPDATED_DT      TIMESTAMP DEFAULT SYSTIMESTAMP NOT NULL,
+   UPDATED_BY      VARCHAR2(30),
+   CONSTRAINT PK_DEPARTMENT PRIMARY KEY (DEPARTMENT_ID),
+   CONSTRAINT UK_DEPARTMENT_CODE UNIQUE (DEPT_CODE)
+) TABLESPACE HR_DATA;
+
+--rollback DROP TABLE HR.DEPARTMENT CASCADE CONSTRAINTS;
+--rollback DROP SEQUENCE HR.SEQ_DEPARTMENT_ID;

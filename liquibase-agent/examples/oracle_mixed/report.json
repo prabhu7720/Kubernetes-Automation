@@ -1,0 +1,378 @@
+{
+  "release": "1.0",
+  "dialect": "oracle",
+  "profile": "oracle",
+  "sources": [
+    "samples/oracle/release_mixed.sql"
+  ],
+  "overall_risk": "HIGH",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "PASS",
+      "detail": "every changeSet has an explicit rollback"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = agent"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "WARN",
+      "detail": "2 finding(s)"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_SEQUENCE",
+      "object": "HR.SEQ_DEPARTMENT_ID",
+      "impact": "Creates sequence HR.SEQ_DEPARTMENT_ID (start 1, increment 1, cache 20).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE HR.SEQ_DEPARTMENT_ID"
+      ],
+      "source": "samples/oracle/release_mixed.sql:2"
+    },
+    {
+      "seq": 2,
+      "kind": "CREATE_TABLE",
+      "object": "HR.DEPARTMENT",
+      "impact": "Creates table HR.DEPARTMENT with 8 column(s); primary key PK_DEPARTMENT (DEPARTMENT_ID); 1 unique constraint(s) [UK_DEPARTMENT_CODE]; tablespace HR_DATA. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE HR.DEPARTMENT CASCADE CONSTRAINTS"
+      ],
+      "source": "samples/oracle/release_mixed.sql:4"
+    },
+    {
+      "seq": 3,
+      "kind": "ADD_COLUMN",
+      "object": "HR.EMPLOYEE",
+      "impact": "Adds column(s) DEPARTMENT_ID NUMBER, HIRE_STATUS VARCHAR2(10) to HR.EMPLOYEE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE HR.EMPLOYEE DROP (DEPARTMENT_ID, HIRE_STATUS)"
+      ],
+      "source": "samples/oracle/release_mixed.sql:17"
+    },
+    {
+      "seq": 4,
+      "kind": "MODIFY_COLUMN",
+      "object": "HR.EMPLOYEE",
+      "impact": "Modifies HR.EMPLOYEE - EMPLOYEE_NAME: type VARCHAR2(100) -> VARCHAR2(50).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE HR.EMPLOYEE MODIFY (EMPLOYEE_NAME VARCHAR2(100))"
+      ],
+      "source": "samples/oracle/release_mixed.sql:18"
+    },
+    {
+      "seq": 5,
+      "kind": "ADD_CONSTRAINT",
+      "object": "HR.FK_EMPLOYEE_DEPARTMENT",
+      "impact": "Adds FOREIGN KEY constraint FK_EMPLOYEE_DEPARTMENT on HR.EMPLOYEE (DEPARTMENT_ID). References DEPARTMENT (DEPARTMENT_ID).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE HR.EMPLOYEE DROP CONSTRAINT FK_EMPLOYEE_DEPARTMENT"
+      ],
+      "source": "samples/oracle/release_mixed.sql:19"
+    },
+    {
+      "seq": 6,
+      "kind": "CREATE_INDEX",
+      "object": "HR.IDX_EMPLOYEE_NAME",
+      "impact": "Creates index HR.IDX_EMPLOYEE_NAME on HR.EMPLOYEE (EMPLOYEE_NAME) in tablespace HR_IDX. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX HR.IDX_EMPLOYEE_NAME"
+      ],
+      "source": "samples/oracle/release_mixed.sql:20"
+    },
+    {
+      "seq": 7,
+      "kind": "CREATE_VIEW",
+      "object": "HR.EMPLOYEE_DEPT_VW",
+      "impact": "Creates view HR.EMPLOYEE_DEPT_VW over HR.EMPLOYEE, HR.DEPARTMENT.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP VIEW HR.EMPLOYEE_DEPT_VW"
+      ],
+      "source": "samples/oracle/release_mixed.sql:22"
+    },
+    {
+      "seq": 8,
+      "kind": "CREATE_PROCEDURE",
+      "object": "HR.PRC_ASSIGN_DEPARTMENT",
+      "impact": "Creates procedure HR.PRC_ASSIGN_DEPARTMENT; touches HR.EMPLOYEE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP PROCEDURE HR.PRC_ASSIGN_DEPARTMENT"
+      ],
+      "source": "samples/oracle/release_mixed.sql:26"
+    },
+    {
+      "seq": 9,
+      "kind": "INSERT",
+      "object": "HR.DEPARTMENT",
+      "impact": "Inserts 1 row into HR.DEPARTMENT.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DELETE FROM HR.DEPARTMENT WHERE DEPARTMENT_ID = 1"
+      ],
+      "source": "samples/oracle/release_mixed.sql:35"
+    },
+    {
+      "seq": 10,
+      "kind": "UPDATE",
+      "object": "HR.EMPLOYEE",
+      "impact": "Updates HR.EMPLOYEE - rows matching: DEPARTMENT_ID IS NULL.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "MERGE INTO HR.EMPLOYEE t USING HR.EMPLOYEE_BKP10 b ON (t.EMPLOYEE_ID = b.EMPLOYEE_ID) WHEN MATCHED THEN UPDATE SET t.DEPARTMENT_ID = b.DEPARTMENT_ID"
+      ],
+      "source": "samples/oracle/release_mixed.sql:36"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "001",
+      "comment": "Create sequence HR.SEQ_DEPARTMENT_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "comment": "Create table HR.DEPARTMENT",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "comment": "Add column(s) to HR.EMPLOYEE",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "comment": "Modify column(s) on HR.EMPLOYEE",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "comment": "Add FK FK_EMPLOYEE_DEPARTMENT on HR.EMPLOYEE",
+      "rollback_complete": true
+    },
+    {
+      "id": "006",
+      "comment": "Create index IDX_EMPLOYEE_NAME on EMPLOYEE",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "comment": "Create or replace view HR.EMPLOYEE_DEPT_VW",
+      "rollback_complete": true
+    },
+    {
+      "id": "008",
+      "comment": "Create or replace procedure HR.PRC_ASSIGN_DEPARTMENT",
+      "rollback_complete": true
+    },
+    {
+      "id": "009",
+      "comment": "Data: insert into HR.DEPARTMENT",
+      "rollback_complete": true
+    },
+    {
+      "id": "010",
+      "comment": "Backup rows of HR.EMPLOYEE before update",
+      "rollback_complete": true
+    },
+    {
+      "id": "011",
+      "comment": "Data: update HR.EMPLOYEE",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "001",
+      "file": "01_APP_HR_DEPARTMENT_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "file": "02_APP_HR_EMPLOYEE_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "file": "03_APP_HR_EMPLOYEE_IDX_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "file": "04_APP_HR_EMPLOYEE_DEPT_VW_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "file": "05_APP_HR_PRC_ASSIGN_DEPARTMENT_PROC_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "006",
+      "file": "06_APP_HR_DEPARTMENT_DML.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "file": "07_APP_HR_EMPLOYEE_DML.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "code": "TYPE_NARROW",
+      "message": "HR.EMPLOYEE.EMPLOYEE_NAME: VARCHAR2(100) -> VARCHAR2(50) reduces length/precision - fails or truncates if existing data exceeds the new size.",
+      "recommendation": "Run the max-length pre-check below.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:18"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "FK_VALIDATION",
+      "message": "Validating FK_EMPLOYEE_DEPARTMENT scans HR.EMPLOYEE and locks it; fails if orphan rows exist.",
+      "recommendation": "ADD ... ENABLE NOVALIDATE, then ALTER TABLE ... ENABLE VALIDATE CONSTRAINT off-peak.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:19"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table EMPLOYEE without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:20"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UPDATE_DATA",
+      "message": "UPDATE overwrites DEPARTMENT_ID on HR.EMPLOYEE; previous values are needed for rollback.",
+      "recommendation": "Back up affected PK + columns before deploy, or accept forward-fix only.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:36"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "FK_NO_INDEX",
+      "message": "FK FK_EMPLOYEE_DEPARTMENT on HR.EMPLOYEE (DEPARTMENT_ID) has no supporting index - parent DELETE/UPDATE does full scans and (Oracle) locks the child table.",
+      "recommendation": "CREATE INDEX IDX_EMPLOYEE_DEPARTMENT_I ON HR.EMPLOYEE (DEPARTMENT_ID);",
+      "category": "risk",
+      "location": "HR.EMPLOYEE"
+    },
+    {
+      "severity": "LOW",
+      "code": "APP_COMPAT_ADD",
+      "message": "Applications using SELECT * or positional INSERT on HR.EMPLOYEE may break.",
+      "recommendation": "Verify no positional INSERT/SELECT * usage in application code.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:17"
+    },
+    {
+      "severity": "LOW",
+      "code": "DML_LOCKS",
+      "message": "Row locks held on HR.EMPLOYEE until COMMIT; long-running DML blocks OLTP.",
+      "recommendation": "Keep DML in its own changeSet; size undo; run off-peak.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:36"
+    },
+    {
+      "severity": "LOW",
+      "code": "ENV_HARDCODED_SCHEMA",
+      "message": "Schema 'HR' is hard-coded 15 time(s).",
+      "recommendation": "For environment independence use a changelog property, e.g. <property name=\"schema\" value=\"HR\"/> and ${schema}.OBJECT, or rely on the connection's default schema (liquibase.defaultSchemaName).",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "LOW",
+      "code": "ENV_HARDCODED_TABLESPACE",
+      "message": "Tablespace name(s) hard-coded: HR_DATA, HR_IDX.",
+      "recommendation": "Use a ${tablespace} property if tablespace names differ between environments.",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "ADD_NOT_NULL_DEFAULT",
+      "message": "Oracle 11g+ adds NOT NULL DEFAULT as metadata-only (fast).",
+      "recommendation": "",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:17"
+    },
+    {
+      "severity": "INFO",
+      "code": "INVALIDATION",
+      "message": "Replacing PL/SQL invalidates dependants; active sessions may get ORA-04068 (existing state of packages discarded).",
+      "recommendation": "Deploy during low traffic; recompile invalid objects after deploy.",
+      "category": "risk",
+      "location": "samples/oracle/release_mixed.sql:26"
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "samples/oracle/release_mixed.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "TX_REMOVED",
+      "message": "1 COMMIT/ROLLBACK statement(s) removed - Liquibase commits each changeSet (house tracker COMMITs are regenerated).",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

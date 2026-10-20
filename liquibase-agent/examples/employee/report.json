@@ -1,0 +1,135 @@
+{
+  "release": "1.0",
+  "dialect": "oracle",
+  "profile": "default",
+  "sources": [
+    "samples/oracle/employee.sql"
+  ],
+  "overall_risk": "INFO",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "PASS",
+      "detail": "every changeSet has an explicit rollback"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "WARN",
+      "detail": "5 finding(s)"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = agent"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "PASS",
+      "detail": "no findings"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_TABLE",
+      "object": "employee",
+      "impact": "Creates table employee with 3 column(s); primary key (unnamed) (employee_id). New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE employee CASCADE CONSTRAINTS"
+      ],
+      "source": "samples/oracle/employee.sql:1"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "001",
+      "comment": "Create table employee",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "001",
+      "file": "01_APP_SCHEMA_EMPLOYEE_DDL.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "code": "NAMING_CASE",
+      "message": "Object name 'employee' is not UPPER_SNAKE_CASE (quoted mixed-case identifiers must be quoted forever).",
+      "recommendation": "Use unquoted upper-case names.",
+      "category": "naming",
+      "location": "samples/oracle/employee.sql:1"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UNNAMED_CONSTRAINT",
+      "message": "Unnamed PRIMARY KEY on employee - database generates a different SYS_ name in every environment (rollback/diff cannot reference it).",
+      "recommendation": "Name every constraint explicitly.",
+      "category": "naming",
+      "location": "samples/oracle/employee.sql:1"
+    },
+    {
+      "severity": "LOW",
+      "code": "NAMING_CASE",
+      "message": "Column 'employee_id' is not UPPER_SNAKE_CASE.",
+      "recommendation": "",
+      "category": "naming",
+      "location": "samples/oracle/employee.sql:1"
+    },
+    {
+      "severity": "LOW",
+      "code": "NAMING_CASE",
+      "message": "Column 'employee_name' is not UPPER_SNAKE_CASE.",
+      "recommendation": "",
+      "category": "naming",
+      "location": "samples/oracle/employee.sql:1"
+    },
+    {
+      "severity": "LOW",
+      "code": "NAMING_CASE",
+      "message": "Column 'created_date' is not UPPER_SNAKE_CASE.",
+      "recommendation": "",
+      "category": "naming",
+      "location": "samples/oracle/employee.sql:1"
+    }
+  ]
+}

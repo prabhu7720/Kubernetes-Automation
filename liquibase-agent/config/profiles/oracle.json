@@ -1,0 +1,4 @@
+{
+  "_comment": "Generic Oracle 19c+ profile.",
+  "dialect": "oracle"
+}

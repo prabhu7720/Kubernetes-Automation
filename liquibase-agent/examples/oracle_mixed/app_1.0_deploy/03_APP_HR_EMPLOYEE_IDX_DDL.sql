@@ -1,0 +1,8 @@
+--liquibase formatted sql
+
+--changeset agent:003
+--comment: Create Index - IDX_EMPLOYEE_NAME
+
+CREATE INDEX HR.IDX_EMPLOYEE_NAME ON HR.EMPLOYEE (EMPLOYEE_NAME) TABLESPACE HR_IDX;
+
+--rollback DROP INDEX HR.IDX_EMPLOYEE_NAME;

@@ -1,0 +1,10 @@
+{
+  "_comment": "Generic MySQL 8.0 profile.",
+  "dialect": "mysql",
+  "oracle_drop_cascade": false,
+  "naming": {
+    "max_identifier_length": 64,
+    "uppercase": false,
+    "object_regex": "^[a-z][a-z0-9_]*$"
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "_comment": "House style reverse-engineered from vibehub_1.34_deploy (SOL_DATA / SOL_SERVICES.<release>.1.0.N, LIQUIBASE_DB_CHANGE_TRACKER pre/post changeSets, 9x rollback script). Oracle.",
+  "dialect": "oracle",
+  "author": "SOL_DATA",
+  "project": "SOL_SERVICES",
+  "app": "VIBEHUB",
+  "release": "1.35",
+  "default_schema": "BILLING_EVENT",
+
+  "changeset_id_pattern": "{project}.{release}.1.0.{seq}",
+  "rollback_id_prefix": "RB.",
+  "tag_changeset_id_pattern": "{project}.{release}.1.0.0-tag",
+  "tag_pattern": "{project}_{release}_PRE",
+  "labels_pattern": "{project}_{release}",
+  "xml_file_pattern": "db.changelog-{project}-{release}.xml",
+  "preconditions": true,
+
+  "file_name_pattern": "{seq:02d}_{app}_{schema}_{object}_{suffix}.sql",
+  "rollback_file_pattern": "{rb_seq}_{app}_{schema}_{release_tag}_ROLLBACK.sql",
+  "deploy_dir_pattern": "{app_lower}_{release}_deploy",
+  "rollback_dir_pattern": "{app_lower}_{release}_Rollback",
+  "plsql_changeset_attrs": " endDelimiter:\"/\"",
+  "file_suffixes": {"INDEX": "INDEXES_DDL", "TRIGGER_REPLACE": "TRIG_ALTER_DDL"},
+
+  "oracle_dictionary_prefix": "DBA",
+
+  "tracker": {
+    "enabled": true,
+    "table": "LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER",
+    "release_label": "{project} {release}",
+    "sql_location": "/opt/scripts/",
+    "index_batch_label": "FK Supporting Indexes"
+  },
+
+  "grants": {
+    "auto_generate": true,
+    "readonly_table_regex": "_AUDIT$|_HIST$|_LOG$",
+    "table": [
+      {"privileges": "SELECT", "grantee": "{schema}_READ_ROLE"},
+      {"privileges": "SELECT, INSERT, UPDATE, DELETE", "grantee": "{schema}_WRITE_ROLE"}
+    ],
+    "view": [{"privileges": "SELECT", "grantee": "{schema}_READ_ROLE"}],
+    "sequence": [{"privileges": "SELECT", "grantee": "{schema}_READ_ROLE"}],
+    "routine": [{"privileges": "EXECUTE", "grantee": "{schema}_WRITE_ROLE"}]
+  },
+  "grant_sql_pattern": "GRANT {privileges} ON \"{schema}\".\"{object}\" TO \"{grantee}\"",
+
+  "tablespace": {"enforce": true, "default_data": "{schema}_DATA"},
+  "required_columns": ["CREATED_DT", "CREATED_BY", "UPDATED_DT", "UPDATED_BY"],
+
+  "naming": {
+    "max_identifier_length": 128,
+    "warn_identifier_length": 30,
+    "author_regex": "^SOL_DATA$",
+    "changeset_id_regex": "^SOL_SERVICES\\.\\d+\\.\\d+\\.1\\.0\\.\\d+$",
+    "prefixes": {
+      "primary_key": "^PK_",
+      "foreign_key": "^FK_",
+      "unique": "^UK_",
+      "check": "^CHK_",
+      "index": "^IDX_",
+      "unique_index": "^(UK|IDX)_",
+      "sequence": "^SEQ_",
+      "trigger": "^TRG_",
+      "view": "_VW$"
+    }
+  },
+  "best_practices": {"allow_hardcoded_schema": true, "allow_hardcoded_tablespace": true},
+  "deployment_notes_extra": [
+    "**Change tracker:** `SELECT CHANGESET_ID, STATUS FROM LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER WHERE RELEASE_NUMBER = '<release label>'` - every row must be COMPLETED; a PENDING row marks the script that failed.",
+    "**Script location:** copy the `_deploy` and `_Rollback` folders to `/opt/scripts/` (SQL_LOCATION in the tracker)."
+  ]
+}

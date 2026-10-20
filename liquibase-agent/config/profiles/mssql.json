@@ -1,0 +1,10 @@
+{
+  "_comment": "Generic SQL Server 2019+ profile.",
+  "dialect": "mssql",
+  "oracle_drop_cascade": false,
+  "naming": {
+    "max_identifier_length": 128,
+    "uppercase": false,
+    "object_regex": "^[A-Za-z][A-Za-z0-9_]*$"
+  }
+}

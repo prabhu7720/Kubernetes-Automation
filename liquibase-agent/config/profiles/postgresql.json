@@ -1,0 +1,10 @@
+{
+  "_comment": "Generic PostgreSQL 12+ profile.",
+  "dialect": "postgresql",
+  "oracle_drop_cascade": false,
+  "naming": {
+    "max_identifier_length": 63,
+    "uppercase": false,
+    "object_regex": "^[a-z][a-z0-9_]*$"
+  }
+}

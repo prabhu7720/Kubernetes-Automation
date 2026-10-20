@@ -1,0 +1,2036 @@
+{
+  "release": "1.34",
+  "dialect": "oracle",
+  "profile": "sol_services",
+  "sources": [
+    "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql",
+    "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql",
+    "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql",
+    "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql",
+    "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql",
+    "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql",
+    "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql",
+    "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql",
+    "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql",
+    "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql",
+    "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql",
+    "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql",
+    "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql"
+  ],
+  "overall_risk": "HIGH",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "WARN",
+      "detail": "1 finding(s)"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "PASS",
+      "detail": "every changeSet has an explicit rollback"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = SOL_DATA"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "PASS",
+      "detail": "1 finding(s)"
+    },
+    {
+      "check": "Supplied Liquibase files (review of the input scripts)",
+      "status": "FAIL",
+      "detail": "36 finding(s)"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_SEQUENCE",
+      "object": "BILLING_EVENT.SEQ_SHADOW_ORDER_ID",
+      "impact": "Creates sequence BILLING_EVENT.SEQ_SHADOW_ORDER_ID (start 1, increment 1, NOCACHE).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_ORDER_ID"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:13"
+    },
+    {
+      "seq": 2,
+      "kind": "CREATE_SEQUENCE",
+      "object": "BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID",
+      "impact": "Creates sequence BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID (start 1, increment 1, NOCACHE).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:19"
+    },
+    {
+      "seq": 3,
+      "kind": "CREATE_TABLE",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Creates table BILLING_EVENT.SHADOW_ORDER with 12 column(s); primary key PK_SHADOW_ORDER (SHADOW_ORDER_ID); 1 unique constraint(s) [UK_SHADOW_ORDER_COID]; foreign key(s) to BILLING_EVENT.ACCOUNT; 2 check constraint(s); tablespace BILLING_EVENT_DATA; NOLOGGING. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE BILLING_EVENT.SHADOW_ORDER CASCADE CONSTRAINTS"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:29"
+    },
+    {
+      "seq": 4,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_ACCT",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_ACCT on BILLING_EVENT.SHADOW_ORDER (ACCOUNT_ID, STATUS) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_ACCT"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:54"
+    },
+    {
+      "seq": 5,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_TTL",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_TTL on BILLING_EVENT.SHADOW_ORDER (STATUS, TTL_EXPIRES_AT) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_TTL"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:55"
+    },
+    {
+      "seq": 6,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on table BILLING_EVENT.SHADOW_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON TABLE BILLING_EVENT.SHADOW_ORDER IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:57"
+    },
+    {
+      "seq": 7,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.SHADOW_ORDER_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.SHADOW_ORDER_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:59"
+    },
+    {
+      "seq": 8,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.CUSTOMER_ORDER_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.CUSTOMER_ORDER_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:60"
+    },
+    {
+      "seq": 9,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.ACCOUNT_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.ACCOUNT_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:61"
+    },
+    {
+      "seq": 10,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.ACCOUNT_NUMBER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.ACCOUNT_NUMBER IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:62"
+    },
+    {
+      "seq": 11,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.SITE_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.SITE_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:63"
+    },
+    {
+      "seq": 12,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.ORDER_TYPE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.ORDER_TYPE IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:64"
+    },
+    {
+      "seq": 13,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.STATUS.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.STATUS IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:65"
+    },
+    {
+      "seq": 14,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_ORDER.TTL_EXPIRES_AT.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.TTL_EXPIRES_AT IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:66"
+    },
+    {
+      "seq": 15,
+      "kind": "CREATE_TABLE",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Creates table BILLING_EVENT.SHADOW_PRODUCT_ORDER with 16 column(s); primary key PK_SHADOW_SERVICE (SHADOW_PRODUCT_ORDER_ID); 1 unique constraint(s) [UK_SHADOW_SVC_SEQ]; foreign key(s) to BILLING_EVENT.SHADOW_ORDER, BILLING_EVENT.PRODUCT; 3 check constraint(s); tablespace BILLING_EVENT_DATA; NOLOGGING. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER CASCADE CONSTRAINTS"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:72"
+    },
+    {
+      "seq": 16,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_SVC_PRODUCT",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_SVC_PRODUCT on BILLING_EVENT.SHADOW_PRODUCT_ORDER (PRODUCT_ID) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_SVC_PRODUCT"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:105"
+    },
+    {
+      "seq": 17,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_SVC_CATEGORY",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_SVC_CATEGORY on BILLING_EVENT.SHADOW_PRODUCT_ORDER (CATEGORY_CODE) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_SVC_CATEGORY"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:106"
+    },
+    {
+      "seq": 18,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on table BILLING_EVENT.SHADOW_PRODUCT_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:108"
+    },
+    {
+      "seq": 19,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.SHADOW_ORDER_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.SHADOW_ORDER_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:110"
+    },
+    {
+      "seq": 20,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.PRODUCT_ID.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.PRODUCT_ID IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:111"
+    },
+    {
+      "seq": 21,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.CATEGORY_CODE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.CATEGORY_CODE IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:112"
+    },
+    {
+      "seq": 22,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.CHECKED_IN_STATUS.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.CHECKED_IN_STATUS IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:113"
+    },
+    {
+      "seq": 23,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.OCCURRENCE_NUMBER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.OCCURRENCE_NUMBER IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:114"
+    },
+    {
+      "seq": 24,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.PRODUCT_TYPE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.PRODUCT_TYPE IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:115"
+    },
+    {
+      "seq": 25,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Sets comment on column BILLING_EVENT.SHADOW_PRODUCT_ORDER.CATEGORY_STATUS.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.CATEGORY_STATUS IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:116"
+    },
+    {
+      "seq": 26,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Grants SELECT on BILLING_EVENT.SHADOW_ORDER to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SHADOW_ORDER FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:123"
+    },
+    {
+      "seq": 27,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Grants SELECT, INSERT, UPDATE, DELETE on BILLING_EVENT.SHADOW_ORDER to BILLING_EVENT_WRITE_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT, INSERT, UPDATE, DELETE ON BILLING_EVENT.SHADOW_ORDER FROM BILLING_EVENT_WRITE_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:124"
+    },
+    {
+      "seq": 28,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Grants SELECT on BILLING_EVENT.SHADOW_PRODUCT_ORDER to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SHADOW_PRODUCT_ORDER FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:127"
+    },
+    {
+      "seq": 29,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Grants SELECT, INSERT, UPDATE, DELETE on BILLING_EVENT.SHADOW_PRODUCT_ORDER to BILLING_EVENT_WRITE_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT, INSERT, UPDATE, DELETE ON BILLING_EVENT.SHADOW_PRODUCT_ORDER FROM BILLING_EVENT_WRITE_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:128"
+    },
+    {
+      "seq": 30,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SEQ_SHADOW_ORDER_ID",
+      "impact": "Grants SELECT on BILLING_EVENT.SEQ_SHADOW_ORDER_ID to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SEQ_SHADOW_ORDER_ID FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:133"
+    },
+    {
+      "seq": 31,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID",
+      "impact": "Grants SELECT on BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:134"
+    },
+    {
+      "seq": 32,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_ORDER_BEFORE",
+      "impact": "Creates BEFORE INSERT OR UPDATE row-level trigger BILLING_EVENT.TRG_SHADOW_ORDER_BEFORE on SHADOW_ORDER. Fires on every insert or update against SHADOW_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_BEFORE"
+      ],
+      "source": "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql:11"
+    },
+    {
+      "seq": 33,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_BEFORE",
+      "impact": "Creates BEFORE INSERT OR UPDATE row-level trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_BEFORE on SHADOW_PRODUCT_ORDER. Fires on every insert or update against SHADOW_PRODUCT_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_BEFORE"
+      ],
+      "source": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:11"
+    },
+    {
+      "seq": 34,
+      "kind": "CREATE_SEQUENCE",
+      "object": "BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID",
+      "impact": "Creates sequence BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID (start 1, increment 1, NOCACHE).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:13"
+    },
+    {
+      "seq": 35,
+      "kind": "CREATE_SEQUENCE",
+      "object": "BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID",
+      "impact": "Creates sequence BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID (start 1, increment 1, NOCACHE).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:19"
+    },
+    {
+      "seq": 36,
+      "kind": "CREATE_TABLE",
+      "object": "BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "impact": "Creates table BILLING_EVENT.SHADOW_ORDER_AUDIT with 16 column(s); primary key PK_SHADOW_ORDER_AUDIT (AUDIT_ID); 1 check constraint(s); tablespace BILLING_EVENT_DATA. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE BILLING_EVENT.SHADOW_ORDER_AUDIT CASCADE CONSTRAINTS"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:28"
+    },
+    {
+      "seq": 37,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_AUD_TS",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_AUD_TS on BILLING_EVENT.SHADOW_ORDER_AUDIT (AUDIT_TIMESTAMP) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_AUD_TS"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:50"
+    },
+    {
+      "seq": 38,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_AUD_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_AUD_ID on BILLING_EVENT.SHADOW_ORDER_AUDIT (SHADOW_ORDER_ID) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_AUD_ID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:51"
+    },
+    {
+      "seq": 39,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_AUD_COID",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_AUD_COID on BILLING_EVENT.SHADOW_ORDER_AUDIT (CUSTOMER_ORDER_ID) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_AUD_COID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:52"
+    },
+    {
+      "seq": 40,
+      "kind": "CREATE_TABLE",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "impact": "Creates table BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT with 20 column(s); primary key PK_SHADOW_PROD_ORDER_AUDIT (AUDIT_ID); 1 check constraint(s); tablespace BILLING_EVENT_DATA. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT CASCADE CONSTRAINTS"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:57"
+    },
+    {
+      "seq": 41,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_TS",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_TS on BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT (AUDIT_TIMESTAMP) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_TS"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:83"
+    },
+    {
+      "seq": 42,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_ID on BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT (SHADOW_PRODUCT_ORDER_ID) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_ID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:84"
+    },
+    {
+      "seq": 43,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_SOID",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_SOID on BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT (SHADOW_ORDER_ID) in tablespace BILLING_EVENT_DATA. Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_PROD_ORD_AUD_SOID"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:85"
+    },
+    {
+      "seq": 44,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "impact": "Grants SELECT on BILLING_EVENT.SHADOW_ORDER_AUDIT to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SHADOW_ORDER_AUDIT FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:92"
+    },
+    {
+      "seq": 45,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "impact": "Grants SELECT on BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:95"
+    },
+    {
+      "seq": 46,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID",
+      "impact": "Grants SELECT on BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:100"
+    },
+    {
+      "seq": 47,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID",
+      "impact": "Grants SELECT on BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:101"
+    },
+    {
+      "seq": 48,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT",
+      "impact": "Creates AFTER INSERT OR UPDATE OR DELETE row-level trigger BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT on SHADOW_ORDER. Fires on every insert or update or delete against SHADOW_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT"
+      ],
+      "source": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "seq": 49,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT",
+      "impact": "Creates AFTER INSERT OR UPDATE OR DELETE row-level trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT on SHADOW_PRODUCT_ORDER. Fires on every insert or update or delete against SHADOW_PRODUCT_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT"
+      ],
+      "source": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "seq": 50,
+      "kind": "DROP_CONSTRAINT",
+      "object": "BILLING_EVENT.FK_ACCT_TRANSFER_FROM_ACCT",
+      "impact": "Drops FOREIGN KEY FK_ACCT_TRANSFER_FROM_ACCT from BILLING_EVENT.ACCOUNT_TRANSFER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER ADD CONSTRAINT FK_ACCT_TRANSFER_FROM_ACCT FOREIGN KEY (FROM_ACCOUNT_ID) REFERENCES BILLING_EVENT.ACCOUNT (ACCOUNT_ID)"
+      ],
+      "source": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:11"
+    },
+    {
+      "seq": 51,
+      "kind": "MODIFY_COLUMN",
+      "object": "BILLING_EVENT.ACCOUNT_TRANSFER",
+      "impact": "Modifies BILLING_EVENT.ACCOUNT_TRANSFER - FROM_ACCOUNT_ID: makes column NULLABLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER MODIFY (FROM_ACCOUNT_ID NOT NULL)"
+      ],
+      "source": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:14"
+    },
+    {
+      "seq": 52,
+      "kind": "ADD_COLUMN",
+      "object": "BILLING_EVENT.ACCOUNT_TRANSFER",
+      "impact": "Adds column(s) TO_ACCOUNT_ID NUMBER to BILLING_EVENT.ACCOUNT_TRANSFER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER DROP COLUMN TO_ACCOUNT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:17"
+    },
+    {
+      "seq": 53,
+      "kind": "UPDATE",
+      "object": "BILLING_EVENT.ACCOUNT_TRANSFER",
+      "impact": "Updates BILLING_EVENT.ACCOUNT_TRANSFER - ALL rows.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "MERGE INTO BILLING_EVENT.ACCOUNT_TRANSFER t USING BILLING_EVENT.ACCOUNT_TRANSFER_BKP53 b ON (t.ACCOUNT_TRANSFER_ID = b.ACCOUNT_TRANSFER_ID) WHEN MATCHED THEN UPDATE SET t.TO_ACCOUNT_ID = b.TO_ACCOUNT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:20"
+    },
+    {
+      "seq": 54,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCOUNT_HOUSE_ADDR_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCOUNT_HOUSE_ADDR_ID on BILLING_EVENT.ACCOUNT (HOUSE_ADDR_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCOUNT_HOUSE_ADDR_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:16"
+    },
+    {
+      "seq": 55,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCT_DISC_DISCOUNT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCT_DISC_DISCOUNT_ID on BILLING_EVENT.ACCOUNT_DISCOUNT (DISCOUNT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCT_DISC_DISCOUNT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:25"
+    },
+    {
+      "seq": 56,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCT_DISC_PRODUCT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCT_DISC_PRODUCT_ID on BILLING_EVENT.ACCOUNT_DISCOUNT (DISCOUNT_PRODUCT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCT_DISC_PRODUCT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:34"
+    },
+    {
+      "seq": 57,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCT_PROD_PRODUCT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCT_PROD_PRODUCT_ID on BILLING_EVENT.ACCOUNT_PRODUCT (PRODUCT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PRODUCT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:43"
+    },
+    {
+      "seq": 58,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCT_PROD_PHONE_ACCT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCT_PROD_PHONE_ACCT_ID on BILLING_EVENT.ACCOUNT_PRODUCT_PHONE (ACCOUNT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PHONE_ACCT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:52"
+    },
+    {
+      "seq": 59,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_ACCT_PROD_PHONE_PROD_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_ACCT_PROD_PHONE_PROD_ID on BILLING_EVENT.ACCOUNT_PRODUCT_PHONE (ACCOUNT_PRODUCT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PHONE_PROD_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:61"
+    },
+    {
+      "seq": 60,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_BILLTO_ADDR_ACCOUNT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_BILLTO_ADDR_ACCOUNT_ID on BILLING_EVENT.BILLTO_ADDRESS (ACCOUNT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_BILLTO_ADDR_ACCOUNT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:70"
+    },
+    {
+      "seq": 61,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_MASTER_ACCT_MASTER_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_MASTER_ACCT_MASTER_ID on BILLING_EVENT.MASTER_ACCOUNT (MASTER_ACCOUNT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_MASTER_ACCT_MASTER_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:79"
+    },
+    {
+      "seq": 62,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SEASONAL_ACCT_ACCOUNT_ID",
+      "impact": "Creates index BILLING_EVENT.IDX_SEASONAL_ACCT_ACCOUNT_ID on BILLING_EVENT.SEASONAL_ACCOUNT (ACCOUNT_ID) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SEASONAL_ACCT_ACCOUNT_ID"
+      ],
+      "source": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:88"
+    },
+    {
+      "seq": 63,
+      "kind": "CREATE_VIEW",
+      "object": "BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "impact": "Replaces view BILLING_EVENT.ACCOUNT_EVENT_VW exposing 73 column(s) over BILLING_EVENT.ACCOUNT, BILLING_EVENT.HOUSE_ADDRESS, BILLING_EVENT.BILLTO_ADDRESS, BILLING_EVENT.ACCOUNT_CONTACT, BILLING_EVENT.ACCOUNT_PROD_CATEGORY, BILLING_EVENT.ACCOUNT_TRANSFER, BILLING_EVENT.SEASONAL_ACCOUNT, BILLING_EVENT.ACCOUNT_EVENT_TRANSACTION. Existing view definition is overwritten; dependent objects are invalidated and recompiled on next use.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "CREATE OR REPLACE FORCE EDITIONABLE VIEW \"BILLING_EVENT\".\"ACCOUNT_EVENT_VW\" (\"ACCOUNT_ID\", \"SITE_ID\", \"ACCOUNT_NUMBER\", \"TWELVE_DIGIT_NUMBER\", \"THIRTEEN_DIGIT_NUMBER\", \"SIXTEEN_DIGIT_NUMBER\", \"COMPANY\", \"DIVISION\", \"FRANCHISE_NUMBER\", \"FIRST_NAME\", \"LAST_NAME\", \"BUSINESS_NAME\", \"BILLING_STATUS\", \"ACCOUNT_STATUS\", \"SECURITY_CODE\", \"BILL_TYPE\", \"DELINQUENCY_STATUS\", \"BIRTH_DATE\", \"TAX_TYPE\", \"TAX_IDENTIFIER\", \"DRIVERS_LICENSE_NUM\", \"PERSISTENT_ID\", \"CONTROLLER_ID\", \"VCM\", \"INSTALL_DATE\", \"DISCONNECTED_DATE\", \"CUSTOMER_CATEGORY\", \"CUSTOMER_TYPE\", \"SERVICE_ADDR_LINE1\", \"SERVICE_ADDR_LINE2\", \"SERVICE_CITY\", \"SERVICE_STATE\", \"SERVICE_ZIP5\", \"SERVICE_ZIP4\", \"NODE_NUMBER\", \"HOUSE_NUMBER\", \"HOUSE_DEVELOPMENT_NUMBER\", \"BILLTO_ADDR_LINE1\", \"BILLTO_ADDR_LINE2\", \"BILLTO_CITY\", \"BILLTO_STATE\", \"BILLTO_ZIP5\", \"BILLTO_ZIP4\", \"BILLTO_CUSTOMER_NAME\", \"BILLTO_BUSINESS_NAME\", \"ACCOUNT_CONTACT_ID\", \"NOTIFICATION_METHOD\", \"CONTACT_TYPE\", \"CONTACT_VALUE\", \"PRIMARY_CONTACT\", \"OPT_IN_FLAG\", \"ACCOUNT_PROD_CATEGORY_ID\", \"PROD_CATEGORY_CODE\", \"CUST_PROD_CAT_STATUS\", \"CUST_PROD_CAT_STATUS_DATE\", \"FROM_ACCOUNT_ID\", \"TRANSFER_STATUS\", \"SEASONAL_SUSPEND_START\", \"SEASONAL_SUSPEND_END\", \"AUTH_USER\", \"MASTER_ACCOUNT\", \"TRANSACTION_ID\", \"EVENT_TIMESTAMP\", \"EVENT_ID\", \"CORRELATION_ID\", \"ORIGIN\", \"SYNC_STATUS\", \"ERR_MSG\", \"ACCOUNT_CREATED_DT\", \"ACCOUNT_CREATED_BY\", \"ACCOUNT_UPDATED_DT\", \"ACCOUNT_UPDATED_BY\") AS\n  SELECT\n    a.ACCOUNT_ID,\n    a.SITE_ID,\n    a.ACCOUNT_NUMBER,\n    LPAD(a.SITE_ID, 3, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS TWELVE_DIGIT_NUMBER,\n    LPAD(a.COMPANY, 2, '0') || LPAD(a.DIVISION, 2, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS THIRTEEN_DIGIT_NUMBER,\n    LPAD(a.SITE_ID, 3, '0') || LPAD(a.COMPANY, 2, '0') || LPAD(a.DIVISION, 2, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS SIXTEEN_DIGIT_NUMBER,\n    a.COMPANY,\n    a.DIVISION,\n    a.FRANCHISE_NUMBER,\n    a.FIRST_NAME,\n    a.LAST_NAME,\n    a.BUSINESS_NAME,\n    a.BILLING_STATUS,\n    a.ACCOUNT_STATUS,\n    a.SECURITY_CODE,\n    a.BILL_TYPE,\n    a.DELINQUENCY_STATUS,\n    a.BIRTH_DATE,\n    a.TAX_TYPE,\n    a.TAX_IDENTIFIER,\n    a.DRIVERS_LICENSE_NUM,\n    a.PERSISTENT_ID,\n    a.CONTROLLER_ID,\n    a.VCM,\n    a.INSTALL_DATE,\n    a.DISCONNECTED_DATE,\n    a.CUSTOMER_CATEGORY,\n    a.CUSTOMER_TYPE,\n    aa.ADDR_LINE1 AS SERVICE_ADDR_LINE1,\n    aa.ADDR_LINE2 AS SERVICE_ADDR_LINE2,\n    aa.CITY AS SERVICE_CITY,\n    aa.STATE AS SERVICE_STATE,\n    aa.ZIP5 AS SERVICE_ZIP5,\n    aa.ZIP4 AS SERVICE_ZIP4,\n    aa.NODE_NUMBER,\n    aa.HOUSE_NUMBER,\n    aa.HOUSE_DEVELOPMENT_NUMBER,\n    bta.BILLTO_ADDR_LINE1 AS BILLTO_ADDR_LINE1,\n    bta.BILLTO_ADDR_LINE2 AS BILLTO_ADDR_LINE2,\n    bta.BILLTO_CITY AS BILLTO_CITY,\n    bta.BILLTO_STATE AS BILLTO_STATE,\n    bta.BILLTO_ZIP5 AS BILLTO_ZIP5,\n    bta.BILLTO_ZIP4 AS BILLTO_ZIP4,\n    bta.BILLTO_FIRST_NAME || ' ' || bta.BILLTO_LAST_NAME AS BILLTO_CUSTOMER_NAME,\n    bta.BILLTO_BUSINESS_NAME AS BILLTO_BUSINESS_NAME,\n    ac.ACCOUNT_CONTACT_ID,\n    ac.NOTIFICATION_METHOD,\n    ac.CONTACT_TYPE,\n    ac.CONTACT_VALUE,\n    ac.PRIMARY AS PRIMARY_CONTACT,\n    ac.OPT_IN_FLAG,\n    apc.ACCOUNT_PROD_CATEGORY_ID,\n    apc.PROD_CATEGORY_CODE,\n    apc.CUST_PROD_CAT_STATUS,\n    apc.CUST_PROD_CAT_STATUS_DATE,\n    at.FROM_ACCOUNT_ID,\n    at.TRANSFER_STATUS,\n    asr.SEASONAL_SUSPEND_START,\n    asr.SEASONAL_SUSPEND_END,\n    aau.AUTH_USER,\n    ma.MASTER_ACCOUNT_ID,\n    aet.TRANSACTION_ID,\n    aet.EVENT_TIMESTAMP,\n    aet.EVENT_ID,\n    aet.CORRELATION_ID,\n    aet.ORIGIN,\n    aet.SYNC_STATUS,\n    aet.ERR_MSG,\n    a.CREATED_DT AS ACCOUNT_CREATED_DT,\n    a.CREATED_BY AS ACCOUNT_CREATED_BY,\n    a.UPDATED_DT AS ACCOUNT_UPDATED_DT,\n    a.UPDATED_BY AS ACCOUNT_UPDATED_BY\n\nFROM\n    BILLING_EVENT.ACCOUNT a\n    INNER JOIN BILLING_EVENT.HOUSE_ADDRESS aa\n        ON a.HOUSE_ADDR_ID = aa.HOUSE_ADDR_ID\n    LEFT JOIN BILLING_EVENT.BILLTO_ADDRESS bta\n        ON a.ACCOUNT_ID = bta.ACCOUNT_ID\n    LEFT JOIN BILLING_EVENT.ACCOUNT_CONTACT ac\n        ON a.ACCOUNT_ID = ac.ACCOUNT_ID\n    LEFT JOIN BILLING_EVENT.ACCOUNT_PROD_CATEGORY apc\n        ON a.ACCOUNT_ID = apc.ACCOUNT_ID\n    LEFT JOIN BILLING_EVENT.ACCOUNT_TRANSFER at\n        ON a.ACCOUNT_ID = at.ACCOUNT_ID\n    LEFT JOIN BILLING_EVENT.SEASONAL_ACCOUNT asr\n        ON a.ACCOUNT_ID = asr.ACCOUNT_ID\n    LEFT JOIN (\n        SELECT ACCOUNT_ID, TRANSACTION_ID, EVENT_TIMESTAMP, EVENT_ID,\n               CORRELATION_ID, ORIGIN, SYNC_STATUS, ERR_MSG\n        FROM (\n            SELECT aevt.ACCOUNT_ID, aevt.TRANSACTION_ID, aevt.EVENT_TIMESTAMP, aevt.EVENT_ID,\n                   aevt.CORRELATION_ID, aevt.ORIGIN, aevt.SYNC_STATUS, aevt.ERR_MSG,\n                   ROW_NUMBER() OVER (PARTITION BY aevt.ACCOUNT_ID\n                                      ORDER BY aevt.EVENT_TIMESTAMP DESC) AS rn\n            FROM BILLING_EVENT.ACCOUNT_EVENT_TRANSACTION aevt\n            WHERE aevt.\"RESOURCE\" = 'account'\n        )\n        WHERE rn = 1\n    ) aet\n        ON a.ACCOUNT_ID = aet.ACCOUNT_ID\n   LEFT JOIN BILLING_EVENT.MASTER_ACCOUNT ma\n        ON a.ACCOUNT_ID = ma.ACCOUNT_ID\n    LEFT JOIN BILLING_EVENT.ACCOUNT_AUTH_USER aau\n        ON a.ACCOUNT_ID = aau.ACCOUNT_ID",
+        "COMMENT ON TABLE BILLING_EVENT.ACCOUNT_EVENT_VW IS 'Account event view with all related details. Returns multiple rows per account for contacts and product categories.'"
+      ],
+      "source": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:18"
+    },
+    {
+      "seq": 64,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "impact": "Sets comment on table BILLING_EVENT.ACCOUNT_EVENT_VW.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON TABLE BILLING_EVENT.ACCOUNT_EVENT_VW IS ''"
+      ],
+      "source": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:127"
+    },
+    {
+      "seq": 65,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "impact": "Grants SELECT on BILLING_EVENT.ACCOUNT_EVENT_VW to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.ACCOUNT_EVENT_VW FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:128"
+    },
+    {
+      "seq": 66,
+      "kind": "DROP_COLUMN",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Drops column(s) STATUS from BILLING_EVENT.SHADOW_ORDER - data in these columns is permanently lost.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.SHADOW_ORDER ADD (STATUS VARCHAR2(20))",
+        "MERGE INTO BILLING_EVENT.SHADOW_ORDER t USING BILLING_EVENT.SHADOW_ORDER_BKP66 b ON (t.SHADOW_ORDER_ID = b.SHADOW_ORDER_ID) WHEN MATCHED THEN UPDATE SET t.STATUS = b.STATUS",
+        "ALTER TABLE BILLING_EVENT.SHADOW_ORDER ADD CONSTRAINT CHK_SHADOW_STATUS CHECK (STATUS IN ('ACTIVE', 'TERMINATED_COID', 'TERMINATED_TTL', 'TERMINATED_CANCEL'))",
+        "CREATE INDEX BILLING_EVENT.IDX_SHADOW_ORDER_ACCT ON BILLING_EVENT.SHADOW_ORDER (ACCOUNT_ID ASC, STATUS ASC) TABLESPACE \"BILLING_EVENT_DATA\"",
+        "CREATE INDEX BILLING_EVENT.IDX_SHADOW_ORDER_TTL ON BILLING_EVENT.SHADOW_ORDER (STATUS ASC, TTL_EXPIRES_AT ASC) TABLESPACE \"BILLING_EVENT_DATA\"",
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_ORDER.STATUS IS 'ACTIVE, TERMINATED_COID, TERMINATED_TTL, TERMINATED_CANCEL'",
+        "ALTER TABLE BILLING_EVENT.SHADOW_ORDER MODIFY (STATUS NOT NULL)"
+      ],
+      "source": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "seq": 67,
+      "kind": "DROP_COLUMN",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "impact": "Drops column(s) FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER - data in these columns is permanently lost.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER ADD (FREE_QUANTITY NUMBER(5) DEFAULT 0, PRODUCT_TYPE VARCHAR2(1), CHECKED_IN_STATUS VARCHAR2(1) DEFAULT 'I', CATEGORY_STATUS VARCHAR2(1) DEFAULT '2', PRODUCT_SEQUENCE NUMBER(5), CATEGORY_SEQUENCE NUMBER(3))",
+        "MERGE INTO BILLING_EVENT.SHADOW_PRODUCT_ORDER t USING BILLING_EVENT.SHADOW_PRODUCT_ORDER_BKP67 b ON (t.SHADOW_PRODUCT_ORDER_ID = b.SHADOW_PRODUCT_ORDER_ID) WHEN MATCHED THEN UPDATE SET t.FREE_QUANTITY = b.FREE_QUANTITY, t.PRODUCT_TYPE = b.PRODUCT_TYPE, t.CHECKED_IN_STATUS = b.CHECKED_IN_STATUS, t.CATEGORY_STATUS = b.CATEGORY_STATUS, t.PRODUCT_SEQUENCE = b.PRODUCT_SEQUENCE, t.CATEGORY_SEQUENCE = b.CATEGORY_SEQUENCE",
+        "ALTER TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER ADD CONSTRAINT UK_SHADOW_SVC_SEQ UNIQUE (SHADOW_ORDER_ID, PRODUCT_SEQUENCE)",
+        "ALTER TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER ADD CONSTRAINT CHK_SHADOW_SVC_TYPE CHECK (PRODUCT_TYPE IN ('R', 'T'))",
+        "ALTER TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER ADD CONSTRAINT CHK_SHADOW_CHECKED_IN CHECK (CHECKED_IN_STATUS IN ('I', 'A', 'D'))",
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.PRODUCT_TYPE IS 'R=Recurring, T=Temporary (from catalog)'",
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.CHECKED_IN_STATUS IS 'I=Install Pending (always for shadow), A=Active, D=Disconnect Pending'",
+        "COMMENT ON COLUMN BILLING_EVENT.SHADOW_PRODUCT_ORDER.CATEGORY_STATUS IS '2 = Pending Connect (always for shadow orders)'"
+      ],
+      "source": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:32"
+    },
+    {
+      "seq": 68,
+      "kind": "DROP_COLUMN",
+      "object": "BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "impact": "Drops column(s) STATUS from BILLING_EVENT.SHADOW_ORDER_AUDIT - data in these columns is permanently lost.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.SHADOW_ORDER_AUDIT ADD (STATUS VARCHAR2(20))",
+        "MERGE INTO BILLING_EVENT.SHADOW_ORDER_AUDIT t USING BILLING_EVENT.SHADOW_ORDER_AUDIT_BKP68 b ON (t.AUDIT_ID = b.AUDIT_ID) WHEN MATCHED THEN UPDATE SET t.STATUS = b.STATUS"
+      ],
+      "source": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "seq": 69,
+      "kind": "DROP_COLUMN",
+      "object": "BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "impact": "Drops column(s) FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT - data in these columns is permanently lost.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT ADD (FREE_QUANTITY NUMBER(5), PRODUCT_TYPE VARCHAR2(1), CHECKED_IN_STATUS VARCHAR2(1), CATEGORY_STATUS VARCHAR2(1), PRODUCT_SEQUENCE NUMBER(5), CATEGORY_SEQUENCE NUMBER(3))",
+        "MERGE INTO BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT t USING BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT_BKP69 b ON (t.AUDIT_ID = b.AUDIT_ID) WHEN MATCHED THEN UPDATE SET t.FREE_QUANTITY = b.FREE_QUANTITY, t.PRODUCT_TYPE = b.PRODUCT_TYPE, t.CHECKED_IN_STATUS = b.CHECKED_IN_STATUS, t.CATEGORY_STATUS = b.CATEGORY_STATUS, t.PRODUCT_SEQUENCE = b.PRODUCT_SEQUENCE, t.CATEGORY_SEQUENCE = b.CATEGORY_SEQUENCE"
+      ],
+      "source": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:29"
+    },
+    {
+      "seq": 70,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT",
+      "impact": "Replaces AFTER INSERT OR UPDATE OR DELETE row-level trigger BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT on SHADOW_ORDER. Fires on every insert or update or delete against SHADOW_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "CREATE OR REPLACE TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT\nAFTER INSERT OR UPDATE OR DELETE ON BILLING_EVENT.SHADOW_ORDER\nFOR EACH ROW\nDECLARE\n    v_action VARCHAR2(10);\n    v_transaction_id VARCHAR2(100);\nBEGIN\n    IF INSERTING THEN\n        v_action := 'INSERT';\n    ELSIF UPDATING THEN\n        v_action := 'UPDATE';\n    ELSIF DELETING THEN\n        v_action := 'DELETE';\n    END IF;\n\n    v_transaction_id := SYS_GUID();\n\n    INSERT INTO BILLING_EVENT.SHADOW_ORDER_AUDIT (\n        AUDIT_ID,\n        AUDIT_TIMESTAMP,\n        AUDIT_ACTION,\n        AUDIT_TRANSACTION_ID,\n        SHADOW_ORDER_ID,\n        CUSTOMER_ORDER_ID,\n        ACCOUNT_ID,\n        ACCOUNT_NUMBER,\n        SITE_ID,\n        ORDER_TYPE,\n        STATUS,\n        TTL_EXPIRES_AT,\n        CREATED_DT,\n        CREATED_BY,\n        UPDATED_DT,\n        UPDATED_BY\n    ) VALUES (\n        BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID.NEXTVAL,\n        SYSTIMESTAMP,\n        v_action,\n        v_transaction_id,\n        COALESCE(:NEW.SHADOW_ORDER_ID, :OLD.SHADOW_ORDER_ID),\n        COALESCE(:NEW.CUSTOMER_ORDER_ID, :OLD.CUSTOMER_ORDER_ID),\n        COALESCE(:NEW.ACCOUNT_ID, :OLD.ACCOUNT_ID),\n        COALESCE(:NEW.ACCOUNT_NUMBER, :OLD.ACCOUNT_NUMBER),\n        COALESCE(:NEW.SITE_ID, :OLD.SITE_ID),\n        COALESCE(:NEW.ORDER_TYPE, :OLD.ORDER_TYPE),\n        COALESCE(:NEW.STATUS, :OLD.STATUS),\n        COALESCE(:NEW.TTL_EXPIRES_AT, :OLD.TTL_EXPIRES_AT),\n        COALESCE(:NEW.CREATED_DT, :OLD.CREATED_DT),\n        COALESCE(:NEW.CREATED_BY, :OLD.CREATED_BY),\n        COALESCE(:NEW.UPDATED_DT, :OLD.UPDATED_DT),\n        COALESCE(:NEW.UPDATED_BY, :OLD.UPDATED_BY)\n    );\nEND;"
+      ],
+      "source": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:15"
+    },
+    {
+      "seq": 71,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT",
+      "impact": "Replaces AFTER INSERT OR UPDATE OR DELETE row-level trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT on SHADOW_PRODUCT_ORDER. Fires on every insert or update or delete against SHADOW_PRODUCT_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "CREATE OR REPLACE TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT\nAFTER INSERT OR UPDATE OR DELETE ON BILLING_EVENT.SHADOW_PRODUCT_ORDER\nFOR EACH ROW\nDECLARE\n    v_action VARCHAR2(10);\n    v_transaction_id VARCHAR2(100);\nBEGIN\n    IF INSERTING THEN\n        v_action := 'INSERT';\n    ELSIF UPDATING THEN\n        v_action := 'UPDATE';\n    ELSIF DELETING THEN\n        v_action := 'DELETE';\n    END IF;\n\n    v_transaction_id := SYS_GUID();\n\n    INSERT INTO BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT (\n        AUDIT_ID,\n        AUDIT_TIMESTAMP,\n        AUDIT_ACTION,\n        AUDIT_TRANSACTION_ID,\n        SHADOW_PRODUCT_ORDER_ID,\n        SHADOW_ORDER_ID,\n        PRODUCT_ID,\n        PAID_QUANTITY,\n        FREE_QUANTITY,\n        CHECKED_IN_STATUS,\n        OCCURRENCE_NUMBER,\n        PRODUCT_TYPE,\n        PRODUCT_SEQUENCE,\n        CATEGORY_CODE,\n        CATEGORY_STATUS,\n        CATEGORY_SEQUENCE,\n        CREATED_DT,\n        CREATED_BY,\n        UPDATED_DT,\n        UPDATED_BY\n    ) VALUES (\n        BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID.NEXTVAL,\n        SYSTIMESTAMP,\n        v_action,\n        v_transaction_id,\n        COALESCE(:NEW.SHADOW_PRODUCT_ORDER_ID, :OLD.SHADOW_PRODUCT_ORDER_ID),\n        COALESCE(:NEW.SHADOW_ORDER_ID, :OLD.SHADOW_ORDER_ID),\n        COALESCE(:NEW.PRODUCT_ID, :OLD.PRODUCT_ID),\n        COALESCE(:NEW.PAID_QUANTITY, :OLD.PAID_QUANTITY),\n        COALESCE(:NEW.FREE_QUANTITY, :OLD.FREE_QUANTITY),\n        COALESCE(:NEW.CHECKED_IN_STATUS, :OLD.CHECKED_IN_STATUS),\n        COALESCE(:NEW.OCCURRENCE_NUMBER, :OLD.OCCURRENCE_NUMBER),\n        COALESCE(:NEW.PRODUCT_TYPE, :OLD.PRODUCT_TYPE),\n        COALESCE(:NEW.PRODUCT_SEQUENCE, :OLD.PRODUCT_SEQUENCE),\n        COALESCE(:NEW.CATEGORY_CODE, :OLD.CATEGORY_CODE),\n        COALESCE(:NEW.CATEGORY_STATUS, :OLD.CATEGORY_STATUS),\n        COALESCE(:NEW.CATEGORY_SEQUENCE, :OLD.CATEGORY_SEQUENCE),\n        COALESCE(:NEW.CREATED_DT, :OLD.CREATED_DT),\n        COALESCE(:NEW.CREATED_BY, :OLD.CREATED_BY),\n        COALESCE(:NEW.UPDATED_DT, :OLD.UPDATED_DT),\n        COALESCE(:NEW.UPDATED_BY, :OLD.UPDATED_BY)\n    );\nEND;"
+      ],
+      "source": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:17"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "SOL_SERVICES.1.34.1.0.1",
+      "comment": "Create sequence BILLING_EVENT.SEQ_SHADOW_ORDER_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.2",
+      "comment": "Create sequence BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.3",
+      "comment": "Create table BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.4",
+      "comment": "Foreign key FK_SHADOW_ORDER_ACCOUNT on BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.5",
+      "comment": "Check constraint CHK_SHADOW_ORDER_TYPE on BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.6",
+      "comment": "Check constraint CHK_SHADOW_STATUS on BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.7",
+      "comment": "Create index IDX_SHADOW_ORDER_ACCT on SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.8",
+      "comment": "Create index IDX_SHADOW_ORDER_TTL on SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.9",
+      "comment": "Create table BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.10",
+      "comment": "Foreign key FK_SHADOW_SVC_ORDER on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.11",
+      "comment": "Foreign key FK_SHADOW_SVC_PRODUCT on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.12",
+      "comment": "Unique constraint UK_SHADOW_SVC_SEQ on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.13",
+      "comment": "Check constraint CHK_SHADOW_SVC_TYPE on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.14",
+      "comment": "Check constraint CHK_SHADOW_CHECKED_IN on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.15",
+      "comment": "Check constraint CHK_SHADOW_CATEGORY on BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.16",
+      "comment": "Create index IDX_SHADOW_SVC_PRODUCT on SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.17",
+      "comment": "Create index IDX_SHADOW_SVC_CATEGORY on SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.18",
+      "comment": "GRANT BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.19",
+      "comment": "GRANT BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.20",
+      "comment": "GRANT BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.21",
+      "comment": "GRANT BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.22",
+      "comment": "GRANT BILLING_EVENT.SEQ_SHADOW_ORDER_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.23",
+      "comment": "GRANT BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.24",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_ORDER_BEFORE",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.25",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_BEFORE",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.26",
+      "comment": "Create sequence BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.27",
+      "comment": "Create sequence BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.28",
+      "comment": "Create table BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.29",
+      "comment": "Check constraint CHK_SHADOW_ORDER_AUD_ACT on BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.30",
+      "comment": "Create index IDX_SHADOW_ORDER_AUD_TS on SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.31",
+      "comment": "Create index IDX_SHADOW_ORDER_AUD_ID on SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.32",
+      "comment": "Create index IDX_SHADOW_ORDER_AUD_COID on SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.33",
+      "comment": "Create table BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.34",
+      "comment": "Check constraint CHK_SHADOW_PROD_ORD_AUD_ACT on BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.35",
+      "comment": "Create index IDX_SHADOW_PROD_ORD_AUD_TS on SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.36",
+      "comment": "Create index IDX_SHADOW_PROD_ORD_AUD_ID on SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.37",
+      "comment": "Create index IDX_SHADOW_PROD_ORD_AUD_SOID on SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.38",
+      "comment": "GRANT BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.39",
+      "comment": "GRANT BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.40",
+      "comment": "GRANT BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.41",
+      "comment": "GRANT BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.42",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.43",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.44",
+      "comment": "Drop FK FK_ACCT_TRANSFER_FROM_ACCT on BILLING_EVENT.ACCOUNT_TRANSFER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.45",
+      "comment": "Modify column(s) on BILLING_EVENT.ACCOUNT_TRANSFER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.46",
+      "comment": "Add column(s) to BILLING_EVENT.ACCOUNT_TRANSFER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.47",
+      "comment": "Backup rows of BILLING_EVENT.ACCOUNT_TRANSFER before update",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.48",
+      "comment": "Data: update BILLING_EVENT.ACCOUNT_TRANSFER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.49",
+      "comment": "Create index IDX_ACCOUNT_HOUSE_ADDR_ID on ACCOUNT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.50",
+      "comment": "Create index IDX_ACCT_DISC_DISCOUNT_ID on ACCOUNT_DISCOUNT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.51",
+      "comment": "Create index IDX_ACCT_DISC_PRODUCT_ID on ACCOUNT_DISCOUNT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.52",
+      "comment": "Create index IDX_ACCT_PROD_PRODUCT_ID on ACCOUNT_PRODUCT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.53",
+      "comment": "Create index IDX_ACCT_PROD_PHONE_ACCT_ID on ACCOUNT_PRODUCT_PHONE",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.54",
+      "comment": "Create index IDX_ACCT_PROD_PHONE_PROD_ID on ACCOUNT_PRODUCT_PHONE",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.55",
+      "comment": "Create index IDX_BILLTO_ADDR_ACCOUNT_ID on BILLTO_ADDRESS",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.56",
+      "comment": "Create index IDX_MASTER_ACCT_MASTER_ID on MASTER_ACCOUNT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.57",
+      "comment": "Create index IDX_SEASONAL_ACCT_ACCOUNT_ID on SEASONAL_ACCOUNT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.58",
+      "comment": "Create or replace view BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.59",
+      "comment": "Comment on BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.60",
+      "comment": "GRANT BILLING_EVENT.ACCOUNT_EVENT_VW",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.61",
+      "comment": "Drop column(s) STATUS from BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.62",
+      "comment": "Drop column(s) FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.63",
+      "comment": "Drop column(s) STATUS from BILLING_EVENT.SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.64",
+      "comment": "Drop column(s) FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.65",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.66",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "SOL_SERVICES.1.34.1.0.1",
+      "file": "01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.2",
+      "file": "02_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.3",
+      "file": "03_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.4",
+      "file": "04_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.5",
+      "file": "05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.6",
+      "file": "06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.7",
+      "file": "07_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.8",
+      "file": "08_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.9",
+      "file": "09_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.10",
+      "file": "10_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_DML.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.11",
+      "file": "11_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.12",
+      "file": "12_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.13",
+      "file": "13_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.14",
+      "file": "14_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_DROP_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.15",
+      "file": "15_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_DROP_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.16",
+      "file": "16_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_DROP_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.17",
+      "file": "17_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.34.1.0.18",
+      "file": "18_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "code": "DML_NO_WHERE",
+      "message": "UPDATE on BILLING_EVENT.ACCOUNT_TRANSFER has no WHERE clause - affects every row.",
+      "recommendation": "Confirm intent; run row-count pre-check; batch with COMMIT every N rows for big tables.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:20"
+    },
+    {
+      "severity": "HIGH",
+      "code": "DROP_COLUMN",
+      "message": "Dropping STATUS from BILLING_EVENT.SHADOW_ORDER destroys data; rollback can restore structure but NOT the data.",
+      "recommendation": "Back up the column data (CREATE TABLE ..._BKP AS SELECT pk, cols) before deploying.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "HIGH",
+      "code": "IMPLICIT_DROPS",
+      "message": "Also implicitly drops: CHK_SHADOW_STATUS, IDX_SHADOW_ORDER_ACCT, IDX_SHADOW_ORDER_TTL",
+      "recommendation": "Rollback re-creates them (generated). Check no FK relies on a dropped index.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "HIGH",
+      "code": "DROP_COLUMN",
+      "message": "Dropping FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER destroys data; rollback can restore structure but NOT the data.",
+      "recommendation": "Back up the column data (CREATE TABLE ..._BKP AS SELECT pk, cols) before deploying.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:32"
+    },
+    {
+      "severity": "HIGH",
+      "code": "IMPLICIT_DROPS",
+      "message": "Also implicitly drops: UK_SHADOW_SVC_SEQ, CHK_SHADOW_SVC_TYPE, CHK_SHADOW_CHECKED_IN",
+      "recommendation": "Rollback re-creates them (generated). Check no FK relies on a dropped index.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:32"
+    },
+    {
+      "severity": "HIGH",
+      "code": "DROP_COLUMN",
+      "message": "Dropping STATUS from BILLING_EVENT.SHADOW_ORDER_AUDIT destroys data; rollback can restore structure but NOT the data.",
+      "recommendation": "Back up the column data (CREATE TABLE ..._BKP AS SELECT pk, cols) before deploying.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "HIGH",
+      "code": "DROP_COLUMN",
+      "message": "Dropping FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE from BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT destroys data; rollback can restore structure but NOT the data.",
+      "recommendation": "Back up the column data (CREATE TABLE ..._BKP AS SELECT pk, cols) before deploying.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:29"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.1 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:3"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.4 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:3"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.5 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:9"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.6 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:9"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.7 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:9"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.12 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:9"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.13 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:9"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "NOLOGGING",
+      "message": "BILLING_EVENT.SHADOW_ORDER is created NOLOGGING - direct-path loads are not written to redo and cannot be recovered from archive logs / Data Guard standby.",
+      "recommendation": "Take an RMAN backup after load or switch to LOGGING once loaded; confirm with DBA if FORCE LOGGING is enabled on the database.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:29"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "NOLOGGING",
+      "message": "BILLING_EVENT.SHADOW_PRODUCT_ORDER is created NOLOGGING - direct-path loads are not written to redo and cannot be recovered from archive logs / Data Guard standby.",
+      "recommendation": "Take an RMAN backup after load or switch to LOGGING once loaded; confirm with DBA if FORCE LOGGING is enabled on the database.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:72"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "ON_DELETE_CASCADE",
+      "message": "FK FK_SHADOW_SVC_ORDER uses ON DELETE CASCADE - deleting a parent row in SHADOW_ORDER silently deletes child rows.",
+      "recommendation": "Confirm this is intended; index the FK column to avoid full scans on parent delete.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:72"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE on SHADOW_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE on SHADOW_PRODUCT_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE OR DELETE on SHADOW_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE OR DELETE on SHADOW_PRODUCT_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "DROP_FK",
+      "message": "Referential integrity enforced by FK_ACCT_TRANSFER_FROM_ACCT is removed - orphan rows can be created; re-adding it on rollback will then fail.",
+      "recommendation": "Rollback must clean orphans first (see generated rollback notes).",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "SET_NULLABLE",
+      "message": "BILLING_EVENT.ACCOUNT_TRANSFER.FROM_ACCOUNT_ID becomes nullable. Rollback (back to NOT NULL) will fail once NULL rows are written.",
+      "recommendation": "Rollback must clean/backfill NULL rows before re-applying NOT NULL.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:14"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UPDATE_DATA",
+      "message": "UPDATE overwrites TO_ACCOUNT_ID on BILLING_EVENT.ACCOUNT_TRANSFER; previous values are needed for rollback.",
+      "recommendation": "Back up affected PK + columns before deploy, or accept forward-fix only.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:20"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:16"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT_DISCOUNT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:25"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT_DISCOUNT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:34"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT_PRODUCT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:43"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT_PRODUCT_PHONE without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:52"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table ACCOUNT_PRODUCT_PHONE without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:61"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table BILLTO_ADDRESS without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:70"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table MASTER_ACCOUNT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:79"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table SEASONAL_ACCOUNT without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:88"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "APP_COMPAT_DROP",
+      "message": "Application code / ORM mappings still referencing the column will fail after deploy.",
+      "recommendation": "Deploy code that stops using the column first (expand/contract).",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "APP_COMPAT_DROP",
+      "message": "Application code / ORM mappings still referencing the column will fail after deploy.",
+      "recommendation": "Deploy code that stops using the column first (expand/contract).",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:32"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "APP_COMPAT_DROP",
+      "message": "Application code / ORM mappings still referencing the column will fail after deploy.",
+      "recommendation": "Deploy code that stops using the column first (expand/contract).",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "APP_COMPAT_DROP",
+      "message": "Application code / ORM mappings still referencing the column will fail after deploy.",
+      "recommendation": "Deploy code that stops using the column first (expand/contract).",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:29"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE OR DELETE on SHADOW_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:15"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE OR DELETE on SHADOW_PRODUCT_ORDER (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:17"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INVALID_WINDOW",
+      "message": "TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT references STATUS and is INVALID between step 66 and its re-creation at step 70. DML on SHADOW_ORDER fails in that window (ORA-04098 for triggers).",
+      "recommendation": "Deploy these changeSets together in one maintenance window / same liquibase update run; quiesce application writes.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INVALID_WINDOW",
+      "message": "TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT references FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE and is INVALID between step 67 and its re-creation at step 71. DML on SHADOW_PRODUCT_ORDER fails in that window (ORA-04098 for triggers).",
+      "recommendation": "Deploy these changeSets together in one maintenance window / same liquibase update run; quiesce application writes.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:32"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INVALID_WINDOW",
+      "message": "TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT references STATUS and is INVALID between step 68 and its re-creation at step 70. DML on SHADOW_ORDER_AUDIT fails in that window (ORA-04098 for triggers).",
+      "recommendation": "Deploy these changeSets together in one maintenance window / same liquibase update run; quiesce application writes.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:18"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "INVALID_WINDOW",
+      "message": "TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT references FREE_QUANTITY, PRODUCT_TYPE, CHECKED_IN_STATUS, CATEGORY_STATUS, PRODUCT_SEQUENCE, CATEGORY_SEQUENCE and is INVALID between step 69 and its re-creation at step 71. DML on SHADOW_PRODUCT_ORDER_AUDIT fails in that window (ORA-04098 for triggers).",
+      "recommendation": "Deploy these changeSets together in one maintenance window / same liquibase update run; quiesce application writes.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:29"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "FK_NO_INDEX",
+      "message": "FK FK_SHADOW_ORDER_ACCOUNT on BILLING_EVENT.SHADOW_ORDER (ACCOUNT_ID) has no supporting index - parent DELETE/UPDATE does full scans and (Oracle) locks the child table.",
+      "recommendation": "CREATE INDEX IDX_SHADOW_ORDER_ACCOUNT_ID ON BILLING_EVENT.SHADOW_ORDER (ACCOUNT_ID);",
+      "category": "risk",
+      "location": "BILLING_EVENT.SHADOW_ORDER"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "FK_NO_INDEX",
+      "message": "FK FK_SHADOW_SVC_ORDER on BILLING_EVENT.SHADOW_PRODUCT_ORDER (SHADOW_ORDER_ID) has no supporting index - parent DELETE/UPDATE does full scans and (Oracle) locks the child table.",
+      "recommendation": "CREATE INDEX IDX_SHADOW_PRODU_SHADOW_ORDER ON BILLING_EVENT.SHADOW_PRODUCT_ORDER (SHADOW_ORDER_ID);",
+      "category": "risk",
+      "location": "BILLING_EVENT.SHADOW_PRODUCT_ORDER"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "LB_DDL_DML_MIX",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.7 mixes DDL and DML. Oracle DDL auto-commits, so a failure leaves the changeSet half-applied and not re-runnable.",
+      "recommendation": "Split DML into its own changeSet.",
+      "category": "liquibase",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:9"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.2 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql:9"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.3 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:9"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.8 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:9"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.9 has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here).",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:9"
+    },
+    {
+      "severity": "LOW",
+      "code": "SEQ_NOCACHE",
+      "message": "SEQ_SHADOW_ORDER_ID is NOCACHE - every NEXTVAL updates the data dictionary; contention under high insert rates / RAC.",
+      "recommendation": "Use CACHE 20+ (NOORDER) unless gap-free ids are mandated.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:13"
+    },
+    {
+      "severity": "LOW",
+      "code": "SEQ_NOCACHE",
+      "message": "SEQ_SHADOW_PRODUCT_ORDER_ID is NOCACHE - every NEXTVAL updates the data dictionary; contention under high insert rates / RAC.",
+      "recommendation": "Use CACHE 20+ (NOORDER) unless gap-free ids are mandated.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:19"
+    },
+    {
+      "severity": "LOW",
+      "code": "IDENT_LONG",
+      "message": "Identifier TRG_SHADOW_PRODUCT_ORDER_BEFORE is 31 chars (> 30) - fails on Oracle < 12.2 / COMPATIBLE < 12.2 databases.",
+      "recommendation": "Keep names <= 30 chars for portability.",
+      "category": "syntax",
+      "location": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "LOW",
+      "code": "SEQ_NOCACHE",
+      "message": "SEQ_SHADOW_ORDER_AUDIT_ID is NOCACHE - every NEXTVAL updates the data dictionary; contention under high insert rates / RAC.",
+      "recommendation": "Use CACHE 20+ (NOORDER) unless gap-free ids are mandated.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:13"
+    },
+    {
+      "severity": "LOW",
+      "code": "SEQ_NOCACHE",
+      "message": "SEQ_SHADOW_PROD_ORDER_AUD_ID is NOCACHE - every NEXTVAL updates the data dictionary; contention under high insert rates / RAC.",
+      "recommendation": "Use CACHE 20+ (NOORDER) unless gap-free ids are mandated.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:19"
+    },
+    {
+      "severity": "LOW",
+      "code": "TRIGGER_WRITES",
+      "message": "Trigger writes to another table (audit pattern); that table's growth/purge policy must be defined.",
+      "recommendation": "Add a retention/purge job for audit rows.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "LOW",
+      "code": "TRIGGER_WRITES",
+      "message": "Trigger writes to another table (audit pattern); that table's growth/purge policy must be defined.",
+      "recommendation": "Add a retention/purge job for audit rows.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:11"
+    },
+    {
+      "severity": "LOW",
+      "code": "APP_COMPAT_ADD",
+      "message": "Applications using SELECT * or positional INSERT on BILLING_EVENT.ACCOUNT_TRANSFER may break.",
+      "recommendation": "Verify no positional INSERT/SELECT * usage in application code.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:17"
+    },
+    {
+      "severity": "LOW",
+      "code": "DML_LOCKS",
+      "message": "Row locks held on BILLING_EVENT.ACCOUNT_TRANSFER until COMMIT; long-running DML blocks OLTP.",
+      "recommendation": "Keep DML in its own changeSet; size undo; run off-peak.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:20"
+    },
+    {
+      "severity": "LOW",
+      "code": "VIEW_FORCE",
+      "message": "FORCE creates the view even if it does not compile.",
+      "recommendation": "Post-check: view STATUS must be VALID.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:18"
+    },
+    {
+      "severity": "LOW",
+      "code": "VIEW_COMPLEX",
+      "message": "Complex view (9 joins / analytic functions).",
+      "recommendation": "Validate execution plan for main access paths after deploy.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:18"
+    },
+    {
+      "severity": "LOW",
+      "code": "TRIGGER_WRITES",
+      "message": "Trigger writes to another table (audit pattern); that table's growth/purge policy must be defined.",
+      "recommendation": "Add a retention/purge job for audit rows.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:15"
+    },
+    {
+      "severity": "LOW",
+      "code": "TRIGGER_WRITES",
+      "message": "Trigger writes to another table (audit pattern); that table's growth/purge policy must be defined.",
+      "recommendation": "Add a retention/purge job for audit rows.",
+      "category": "risk",
+      "location": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:17"
+    },
+    {
+      "severity": "LOW",
+      "code": "LB_TRACKER_IN_DDL",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.1 mixes tracker bookkeeping with DDL; if the DDL fails the tracker row stays PENDING and the changeSet is not re-runnable.",
+      "recommendation": "Use separate -pre / -post changeSets.",
+      "category": "liquibase",
+      "location": "vibehub_1.34_deploy/01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "LB_TRACKER_IN_DDL",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.4 mixes tracker bookkeeping with DDL; if the DDL fails the tracker row stays PENDING and the changeSet is not re-runnable.",
+      "recommendation": "Use separate -pre / -post changeSets.",
+      "category": "liquibase",
+      "location": "vibehub_1.34_deploy/04_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_TABLES_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.2-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.2-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql:30"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.3-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.3-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/03_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql:30"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.5-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.5-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql:65"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.6-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.6-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql:73"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.7-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.7-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql:25"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.8-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.8-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/08_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql:92"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.9-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.9-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/09_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql:130"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.10-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.10-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/10_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql:56"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.11-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.11-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/11_VIBEHUB_BILLING_EVENT_SHADOW_AUDIT_DROP_COLUMNS_ALTER_DDL.sql:43"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.12-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.12-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/12_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql:67"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.13-pre has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:3"
+    },
+    {
+      "severity": "LOW",
+      "code": "RB_MISSING",
+      "message": "[input changelog] changeSet SOL_SERVICES.1.34.1.0.13-post has no --rollback (formatted SQL never auto-generates rollbacks; `liquibase rollback` will fail here). Tracker bookkeeping changeSet.",
+      "recommendation": "Add --rollback statements (or an explicit no-op such as '--rollback SELECT 1 FROM DUAL;').",
+      "category": "rollback",
+      "location": "vibehub_1.34_deploy/13_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql:67"
+    },
+    {
+      "severity": "INFO",
+      "code": "ENV_HARDCODED_SCHEMA",
+      "message": "Schema 'BILLING_EVENT' is hard-coded 118 time(s).",
+      "recommendation": "For environment independence use a changelog property, e.g. <property name=\"schema\" value=\"BILLING_EVENT\"/> and ${schema}.OBJECT, or rely on the connection's default schema (liquibase.defaultSchemaName).",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "vibehub_1.34_deploy/07_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "TX_REMOVED",
+      "message": "29 COMMIT/ROLLBACK statement(s) removed - Liquibase commits each changeSet (house tracker COMMITs are regenerated).",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "TRACKER_REGENERATED",
+      "message": "26 existing change-tracker statement(s) ignored and regenerated with new changeSet ids.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

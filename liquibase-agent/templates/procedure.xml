@@ -1,0 +1,20 @@
+<!-- @template create_procedure -->
+<createProcedure${attrs}><![CDATA[
+${body}
+]]></createProcedure>
+<!-- @template plsql -->
+<sql splitStatements="false" stripComments="false"${attrs}><![CDATA[
+${body}
+]]></sql>
+<!-- @template create_view -->
+<createView${attrs}><![CDATA[
+${body}
+]]></createView>
+<!-- @template sql -->
+<sql${attrs}><![CDATA[
+${body}
+]]></sql>
+<!-- @template insert -->
+<insert${attrs}>
+${columns}
+</insert>

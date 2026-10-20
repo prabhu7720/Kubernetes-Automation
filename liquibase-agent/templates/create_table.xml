@@ -1,0 +1,16 @@
+<!-- @template create_table -->
+<createTable${attrs}>
+${columns}
+</createTable>
+<!-- @template column -->
+<column${attrs}/>
+<!-- @template column_with_constraints -->
+<column${attrs}>
+    <constraints${constraint_attrs}/>
+</column>
+<!-- @template modify_sql_append -->
+<modifySql dbms="${dbms}">
+    <append value="${value}"/>
+</modifySql>
+<!-- @template drop_table -->
+<dropTable${attrs}/>

@@ -1,0 +1,318 @@
+{
+  "release": "1.35",
+  "dialect": "oracle",
+  "profile": "sol_services",
+  "sources": [
+    "samples/release_1.35/shadow_order_enhancements.sql"
+  ],
+  "overall_risk": "MEDIUM",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "PASS",
+      "detail": "every changeSet has an explicit rollback"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = SOL_DATA"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "PASS",
+      "detail": "1 finding(s)"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "ADD_COLUMN",
+      "object": "BILLING_EVENT.SHADOW_ORDER",
+      "impact": "Adds column(s) CANCEL_REASON VARCHAR2(200) to BILLING_EVENT.SHADOW_ORDER.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE BILLING_EVENT.SHADOW_ORDER DROP COLUMN CANCEL_REASON"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:4"
+    },
+    {
+      "seq": 2,
+      "kind": "CREATE_INDEX",
+      "object": "BILLING_EVENT.IDX_SHADOW_ORDER_TTL2",
+      "impact": "Creates index BILLING_EVENT.IDX_SHADOW_ORDER_TTL2 on BILLING_EVENT.SHADOW_ORDER (TTL_EXPIRES_AT) in tablespace BILLING_EVENT_DATA. Index build reads the whole table; DML may be blocked during the build.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX BILLING_EVENT.IDX_SHADOW_ORDER_TTL2"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:7"
+    },
+    {
+      "seq": 3,
+      "kind": "CREATE_SEQUENCE",
+      "object": "BILLING_EVENT.SEQ_CANCEL_REASON_ID",
+      "impact": "Creates sequence BILLING_EVENT.SEQ_CANCEL_REASON_ID (start 1, increment 1, cache 20).",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP SEQUENCE BILLING_EVENT.SEQ_CANCEL_REASON_ID"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:10"
+    },
+    {
+      "seq": 4,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.SEQ_CANCEL_REASON_ID",
+      "impact": "Grants SELECT on BILLING_EVENT.SEQ_CANCEL_REASON_ID to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.SEQ_CANCEL_REASON_ID FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:10"
+    },
+    {
+      "seq": 5,
+      "kind": "CREATE_TABLE",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Creates table BILLING_EVENT.CANCEL_REASON with 7 column(s); primary key PK_CANCEL_REASON (CANCEL_REASON_ID); 1 unique constraint(s) [UK_CANCEL_REASON_CODE]; tablespace BILLING_EVENT_DATA. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE BILLING_EVENT.CANCEL_REASON CASCADE CONSTRAINTS"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:12"
+    },
+    {
+      "seq": 6,
+      "kind": "COMMENT",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Sets comment on table BILLING_EVENT.CANCEL_REASON.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "COMMENT ON TABLE BILLING_EVENT.CANCEL_REASON IS ''"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:24"
+    },
+    {
+      "seq": 7,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Grants SELECT on BILLING_EVENT.CANCEL_REASON to BILLING_EVENT_READ_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT ON BILLING_EVENT.CANCEL_REASON FROM BILLING_EVENT_READ_ROLE"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:12"
+    },
+    {
+      "seq": 8,
+      "kind": "GRANT",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Grants SELECT, INSERT, UPDATE, DELETE on BILLING_EVENT.CANCEL_REASON to BILLING_EVENT_WRITE_ROLE.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "REVOKE SELECT, INSERT, UPDATE, DELETE ON BILLING_EVENT.CANCEL_REASON FROM BILLING_EVENT_WRITE_ROLE"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:12"
+    },
+    {
+      "seq": 9,
+      "kind": "INSERT",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Inserts 1 row into BILLING_EVENT.CANCEL_REASON.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DELETE FROM BILLING_EVENT.CANCEL_REASON WHERE CANCEL_REASON_ID = 1"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:26"
+    },
+    {
+      "seq": 10,
+      "kind": "INSERT",
+      "object": "BILLING_EVENT.CANCEL_REASON",
+      "impact": "Inserts 1 row into BILLING_EVENT.CANCEL_REASON.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DELETE FROM BILLING_EVENT.CANCEL_REASON WHERE CANCEL_REASON_ID = 2"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:27"
+    },
+    {
+      "seq": 11,
+      "kind": "CREATE_TRIGGER",
+      "object": "BILLING_EVENT.TRG_CANCEL_REASON_BEFORE",
+      "impact": "Creates BEFORE INSERT OR UPDATE row-level trigger BILLING_EVENT.TRG_CANCEL_REASON_BEFORE on CANCEL_REASON. Fires on every insert or update against CANCEL_REASON.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER BILLING_EVENT.TRG_CANCEL_REASON_BEFORE"
+      ],
+      "source": "samples/release_1.35/shadow_order_enhancements.sql:30"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "SOL_SERVICES.1.35.1.0.1",
+      "comment": "Add column(s) to BILLING_EVENT.SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.2",
+      "comment": "Create index IDX_SHADOW_ORDER_TTL2 on SHADOW_ORDER",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.3",
+      "comment": "Create sequence BILLING_EVENT.SEQ_CANCEL_REASON_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.4",
+      "comment": "GRANT BILLING_EVENT.SEQ_CANCEL_REASON_ID",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.5",
+      "comment": "Create table BILLING_EVENT.CANCEL_REASON",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.6",
+      "comment": "GRANT BILLING_EVENT.CANCEL_REASON",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.7",
+      "comment": "GRANT BILLING_EVENT.CANCEL_REASON",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.8",
+      "comment": "Data: insert into BILLING_EVENT.CANCEL_REASON",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.9",
+      "comment": "Data: insert into BILLING_EVENT.CANCEL_REASON",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.10",
+      "comment": "Create or replace trigger BILLING_EVENT.TRG_CANCEL_REASON_BEFORE",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "SOL_SERVICES.1.35.1.0.1",
+      "file": "01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_ADD_COLUMNS_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.2",
+      "file": "02_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_INDEXES_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.3",
+      "file": "03_VIBEHUB_BILLING_EVENT_CANCEL_REASON_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.4",
+      "file": "04_VIBEHUB_BILLING_EVENT_CANCEL_REASON_DML.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "SOL_SERVICES.1.35.1.0.5",
+      "file": "05_VIBEHUB_BILLING_EVENT_CANCEL_REASON_BEFORE_TRIG_DDL.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "MEDIUM",
+      "code": "INDEX_LOCK",
+      "message": "CREATE INDEX on existing table SHADOW_ORDER without ONLINE takes a table lock that blocks DML for the duration of the build.",
+      "recommendation": "Add ONLINE (Enterprise Edition) or deploy in a low-traffic window.",
+      "category": "risk",
+      "location": "samples/release_1.35/shadow_order_enhancements.sql:7"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT OR UPDATE on CANCEL_REASON (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "samples/release_1.35/shadow_order_enhancements.sql:30"
+    },
+    {
+      "severity": "LOW",
+      "code": "APP_COMPAT_ADD",
+      "message": "Applications using SELECT * or positional INSERT on BILLING_EVENT.SHADOW_ORDER may break.",
+      "recommendation": "Verify no positional INSERT/SELECT * usage in application code.",
+      "category": "risk",
+      "location": "samples/release_1.35/shadow_order_enhancements.sql:4"
+    },
+    {
+      "severity": "INFO",
+      "code": "ENV_HARDCODED_SCHEMA",
+      "message": "Schema 'BILLING_EVENT' is hard-coded 13 time(s).",
+      "recommendation": "For environment independence use a changelog property, e.g. <property name=\"schema\" value=\"BILLING_EVENT\"/> and ${schema}.OBJECT, or rely on the connection's default schema (liquibase.defaultSchemaName).",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "samples/release_1.35/shadow_order_enhancements.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "TX_REMOVED",
+      "message": "1 COMMIT/ROLLBACK statement(s) removed - Liquibase commits each changeSet (house tracker COMMITs are regenerated).",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

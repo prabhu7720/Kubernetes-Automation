@@ -1,0 +1,12 @@
+<!-- @template create_index -->
+<createIndex${attrs}>
+${columns}
+</createIndex>
+<!-- @template index_column -->
+<column${attrs}/>
+<!-- @template drop_index -->
+<dropIndex${attrs}/>
+<!-- @template create_sequence -->
+<createSequence${attrs}/>
+<!-- @template drop_sequence -->
+<dropSequence${attrs}/>

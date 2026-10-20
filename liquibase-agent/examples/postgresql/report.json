@@ -1,0 +1,409 @@
+{
+  "release": "1.0",
+  "dialect": "postgresql",
+  "profile": "postgresql",
+  "sources": [
+    "samples/postgresql/release.sql"
+  ],
+  "overall_risk": "HIGH",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "FAIL",
+      "detail": "4 finding(s)"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "WARN",
+      "detail": "3 finding(s)"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = agent"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "WARN",
+      "detail": "1 finding(s)"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_TABLE",
+      "object": "app.customer",
+      "impact": "Creates table app.customer with 5 column(s); primary key (unnamed) (customer_id); 1 unique constraint(s) [uk_customer_email]; 1 check constraint(s). New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE app.customer"
+      ],
+      "source": "samples/postgresql/release.sql:1"
+    },
+    {
+      "seq": 2,
+      "kind": "CREATE_TABLE",
+      "object": "app.customer_order",
+      "impact": "Creates table app.customer_order with 4 column(s); primary key (unnamed) (order_id); foreign key(s) to app.customer. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE app.customer_order"
+      ],
+      "source": "samples/postgresql/release.sql:11"
+    },
+    {
+      "seq": 3,
+      "kind": "CREATE_INDEX",
+      "object": "app.idx_customer_order_created",
+      "impact": "Creates index app.idx_customer_order_created on app.customer_order (created_at DESC). Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX app.idx_customer_order_created"
+      ],
+      "source": "samples/postgresql/release.sql:18"
+    },
+    {
+      "seq": 4,
+      "kind": "ADD_COLUMN",
+      "object": "app.customer",
+      "impact": "Adds column(s) phone VARCHAR(30), loyalty_points INTEGER to app.customer.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE app.customer DROP COLUMN phone, DROP COLUMN loyalty_points"
+      ],
+      "source": "samples/postgresql/release.sql:20"
+    },
+    {
+      "seq": 5,
+      "kind": "MODIFY_COLUMN",
+      "object": "app.customer",
+      "impact": "Modifies app.customer - full_name: sets NOT NULL.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE app.customer ALTER COLUMN full_name DROP NOT NULL"
+      ],
+      "source": "samples/postgresql/release.sql:21"
+    },
+    {
+      "seq": 6,
+      "kind": "CREATE_FUNCTION",
+      "object": "app.fn_touch_created",
+      "impact": "Creates function app.fn_touch_created.",
+      "rollback_complete": false,
+      "rollback_sql": [
+        "-- MANUAL: restore the previous definition of app.fn_touch_created (definition captured by the pre-check) or DROP FUNCTION app.fn_touch_created if the object is new"
+      ],
+      "source": "samples/postgresql/release.sql:23"
+    },
+    {
+      "seq": 7,
+      "kind": "CREATE_TRIGGER",
+      "object": "app.trg_customer_touch",
+      "impact": "Creates BEFORE INSERT row-level trigger app.trg_customer_touch on customer. Fires on every insert against customer.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TRIGGER trg_customer_touch ON app.customer"
+      ],
+      "source": "samples/postgresql/release.sql:30"
+    },
+    {
+      "seq": 8,
+      "kind": "CREATE_VIEW",
+      "object": "app.active_customer_v",
+      "impact": "Creates view app.active_customer_v over app.customer.",
+      "rollback_complete": false,
+      "rollback_sql": [
+        "-- MANUAL: restore the previous definition of app.active_customer_v (definition captured by the pre-check) or DROP VIEW app.active_customer_v if the object is new"
+      ],
+      "source": "samples/postgresql/release.sql:33"
+    },
+    {
+      "seq": 9,
+      "kind": "DELETE",
+      "object": "app.customer",
+      "impact": "Deletes app.customer - rows matching: status = 'blocked'.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "INSERT INTO app.customer SELECT * FROM app.CUSTOMER_BKP9"
+      ],
+      "source": "samples/postgresql/release.sql:36"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "001",
+      "comment": "Create table app.customer",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "comment": "Check constraint chk_customer_status on app.customer",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "comment": "Create table app.customer_order",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "comment": "Foreign key None on app.customer_order",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "comment": "Create index idx_customer_order_created on customer_order",
+      "rollback_complete": true
+    },
+    {
+      "id": "006",
+      "comment": "Add column(s) to app.customer",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "comment": "Modify column(s) on app.customer",
+      "rollback_complete": true
+    },
+    {
+      "id": "008",
+      "comment": "Create or replace function app.fn_touch_created",
+      "rollback_complete": false
+    },
+    {
+      "id": "009",
+      "comment": "Create trigger app.trg_customer_touch",
+      "rollback_complete": true
+    },
+    {
+      "id": "010",
+      "comment": "Create or replace view app.active_customer_v",
+      "rollback_complete": false
+    },
+    {
+      "id": "011",
+      "comment": "Backup rows of app.customer before delete",
+      "rollback_complete": true
+    },
+    {
+      "id": "012",
+      "comment": "Data: delete app.customer",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "001",
+      "file": "01_APP_APP_CUSTOMER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "file": "02_APP_APP_CUSTOMER_ORDER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "file": "03_APP_APP_CUSTOMER_ORDER_IDX_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "file": "04_APP_APP_CUSTOMER_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "file": "05_APP_APP_FN_TOUCH_CREATED_FUNC_DDL.sql",
+      "rollback_complete": false
+    },
+    {
+      "id": "006",
+      "file": "06_APP_APP_CUSTOMER_TOUCH_TRIG_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "file": "07_APP_APP_ACTIVE_CUSTOMER_V_DDL.sql",
+      "rollback_complete": false
+    },
+    {
+      "id": "008",
+      "file": "08_APP_APP_CUSTOMER_DML.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "code": "DELETE_DATA",
+      "message": "DELETE on app.customer removes data; rollback needs a backup.",
+      "recommendation": "CREATE TABLE <tbl>_BKP_<release> AS SELECT ... WHERE <same predicate> before the delete.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:36"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[xml] changeSet 008: rollback is incomplete / manual. ",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "008"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[xml] changeSet 010: rollback is incomplete / manual. ",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "010"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[formatted-sql] changeSet 005: rollback is incomplete / manual. CREATE OR REPLACE app.fn_touch_created without --baseline: the agent cannot know whether a previous version exists, so it will not generate a DROP that could delete a live object.",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "05_APP_APP_FN_TOUCH_CREATED_FUNC_DDL.sql"
+    },
+    {
+      "severity": "HIGH",
+      "code": "RB_INCOMPLETE",
+      "message": "[formatted-sql] changeSet 007: rollback is incomplete / manual. CREATE OR REPLACE app.active_customer_v without --baseline: the agent cannot know whether a previous version exists, so it will not generate a DROP that could delete a live object.",
+      "recommendation": "Complete the ROLLBACK-MANUAL / TODO section before release (supply --baseline to automate).",
+      "category": "rollback",
+      "location": "07_APP_APP_ACTIVE_CUSTOMER_V_DDL.sql"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "ON_DELETE_CASCADE",
+      "message": "FK (unnamed) uses ON DELETE CASCADE - deleting a parent row in customer silently deletes child rows.",
+      "recommendation": "Confirm this is intended; index the FK column to avoid full scans on parent delete.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "REPLACE_UNKNOWN",
+      "message": "CREATE OR REPLACE fn_touch_created without baseline - rollback defaults to DROP.",
+      "recommendation": "Provide the current source if it already exists.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:23"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "TRIGGER_OVERHEAD",
+      "message": "Row-level trigger adds per-row overhead to all INSERT on customer (bulk loads/batch jobs slow down).",
+      "recommendation": "Benchmark batch jobs; consider disabling during bulk loads.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:30"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "REPLACE_UNKNOWN",
+      "message": "CREATE OR REPLACE active_customer_v: without a baseline the agent cannot tell whether a previous version exists. Rollback defaults to DROP VIEW.",
+      "recommendation": "If the view exists today, supply its DDL via --baseline so rollback restores it.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:33"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "FK_NO_INDEX",
+      "message": "FK (unnamed) on APP.CUSTOMER_ORDER (customer_id) has no supporting index - parent DELETE/UPDATE does full scans and (Oracle) locks the child table.",
+      "recommendation": "CREATE INDEX IDX_customer_ord_customer_id ON APP.CUSTOMER_ORDER (customer_id);",
+      "category": "risk",
+      "location": "APP.CUSTOMER_ORDER"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UNNAMED_CONSTRAINT",
+      "message": "Unnamed PRIMARY KEY on customer - database generates a different SYS_ name in every environment (rollback/diff cannot reference it).",
+      "recommendation": "Name every constraint explicitly.",
+      "category": "naming",
+      "location": "samples/postgresql/release.sql:1"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UNNAMED_CONSTRAINT",
+      "message": "Unnamed PRIMARY KEY on customer_order - database generates a different SYS_ name in every environment (rollback/diff cannot reference it).",
+      "recommendation": "Name every constraint explicitly.",
+      "category": "naming",
+      "location": "samples/postgresql/release.sql:11"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UNNAMED_CONSTRAINT",
+      "message": "Unnamed FOREIGN KEY on customer_order - database generates a different SYS_ name in every environment (rollback/diff cannot reference it).",
+      "recommendation": "Name every constraint explicitly.",
+      "category": "naming",
+      "location": "samples/postgresql/release.sql:11"
+    },
+    {
+      "severity": "LOW",
+      "code": "DML_LOCKS",
+      "message": "Row locks held on app.customer until COMMIT; long-running DML blocks OLTP.",
+      "recommendation": "Keep DML in its own changeSet; size undo; run off-peak.",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:36"
+    },
+    {
+      "severity": "LOW",
+      "code": "ENV_HARDCODED_SCHEMA",
+      "message": "Schema 'APP' is hard-coded 12 time(s).",
+      "recommendation": "For environment independence use a changelog property, e.g. <property name=\"schema\" value=\"APP\"/> and ${schema}.OBJECT, or rely on the connection's default schema (liquibase.defaultSchemaName).",
+      "category": "best_practice",
+      "location": ""
+    },
+    {
+      "severity": "INFO",
+      "code": "CONCURRENTLY",
+      "message": "CREATE INDEX CONCURRENTLY cannot run inside a transaction - changeSet is generated with runInTransaction=\"false\"; a failed build leaves an INVALID index.",
+      "recommendation": "",
+      "category": "risk",
+      "location": "samples/postgresql/release.sql:18"
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "samples/postgresql/release.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

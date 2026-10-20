@@ -1,0 +1,232 @@
+{
+  "release": "1.0",
+  "dialect": "mysql",
+  "profile": "mysql",
+  "sources": [
+    "samples/mysql/release.sql"
+  ],
+  "overall_risk": "HIGH",
+  "checklist": [
+    {
+      "check": "SQL syntax",
+      "status": "PASS",
+      "detail": "no findings"
+    },
+    {
+      "check": "Liquibase syntax (generated + supplied changelogs)",
+      "status": "PASS",
+      "detail": "well-formed, ids/authors present"
+    },
+    {
+      "check": "Duplicate changeSets",
+      "status": "PASS",
+      "detail": "none"
+    },
+    {
+      "check": "Rollback coverage",
+      "status": "PASS",
+      "detail": "every changeSet has an explicit rollback"
+    },
+    {
+      "check": "Naming conventions",
+      "status": "WARN",
+      "detail": "1 finding(s)"
+    },
+    {
+      "check": "Existing object conflicts",
+      "status": "PASS",
+      "detail": "no conflicts (against supplied baseline)"
+    },
+    {
+      "check": "One logical change per changeSet",
+      "status": "PASS",
+      "detail": "XML: enforced by construction"
+    },
+    {
+      "check": "DDL and DML separated",
+      "status": "PASS",
+      "detail": "enforced by construction"
+    },
+    {
+      "check": "Author naming",
+      "status": "PASS",
+      "detail": "author = agent"
+    },
+    {
+      "check": "Sequential IDs",
+      "status": "PASS",
+      "detail": "sequential"
+    },
+    {
+      "check": "Environment-independent scripts",
+      "status": "PASS",
+      "detail": "no findings"
+    }
+  ],
+  "operations": [
+    {
+      "seq": 1,
+      "kind": "CREATE_TABLE",
+      "object": "inventory_item",
+      "impact": "Creates table inventory_item with 5 column(s); primary key (unnamed) (item_id); 1 unique constraint(s) [uk_inventory_sku]. New empty object - no impact on existing data or sessions.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP TABLE inventory_item"
+      ],
+      "source": "samples/mysql/release.sql:1"
+    },
+    {
+      "seq": 2,
+      "kind": "MODIFY_COLUMN",
+      "object": "inventory_item",
+      "impact": "Modifies inventory_item - sku: type VARCHAR(40) -> VARCHAR(30), sets NOT NULL.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE inventory_item MODIFY COLUMN sku VARCHAR(40) NOT NULL"
+      ],
+      "source": "samples/mysql/release.sql:12"
+    },
+    {
+      "seq": 3,
+      "kind": "ADD_COLUMN",
+      "object": "inventory_item",
+      "impact": "Adds column(s) warehouse_id INT to inventory_item.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "ALTER TABLE inventory_item DROP COLUMN warehouse_id"
+      ],
+      "source": "samples/mysql/release.sql:13"
+    },
+    {
+      "seq": 4,
+      "kind": "CREATE_INDEX",
+      "object": "idx_inventory_wh",
+      "impact": "Creates index idx_inventory_wh on inventory_item (warehouse_id). Table is new in this release - no lock impact.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP INDEX idx_inventory_wh ON inventory_item"
+      ],
+      "source": "samples/mysql/release.sql:14"
+    },
+    {
+      "seq": 5,
+      "kind": "CREATE_PROCEDURE",
+      "object": "sp_restock",
+      "impact": "Creates procedure sp_restock; touches inventory_item.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DROP PROCEDURE sp_restock"
+      ],
+      "source": "samples/mysql/release.sql:17"
+    },
+    {
+      "seq": 6,
+      "kind": "INSERT",
+      "object": "inventory_item",
+      "impact": "Inserts 1 row into inventory_item.",
+      "rollback_complete": true,
+      "rollback_sql": [
+        "DELETE FROM inventory_item WHERE sku = 'SKU-001' AND qty = 10 AND price = 9.99"
+      ],
+      "source": "samples/mysql/release.sql:25"
+    }
+  ],
+  "changesets_xml": [
+    {
+      "id": "001",
+      "comment": "Create table inventory_item",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "comment": "Index idx_inventory_qty on inventory_item (inline KEY)",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "comment": "MODIFY_COLUMN inventory_item",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "comment": "Add column(s) to inventory_item",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "comment": "Create index idx_inventory_wh on inventory_item",
+      "rollback_complete": true
+    },
+    {
+      "id": "006",
+      "comment": "Create procedure sp_restock",
+      "rollback_complete": true
+    },
+    {
+      "id": "007",
+      "comment": "Data: insert into inventory_item",
+      "rollback_complete": true
+    }
+  ],
+  "scripts_sql": [
+    {
+      "id": "001",
+      "file": "01_APP_SCHEMA_INVENTORY_ITEM_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "002",
+      "file": "02_APP_SCHEMA_INVENTORY_ITEM_ALTER_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "003",
+      "file": "03_APP_SCHEMA_INVENTORY_ITEM_IDX_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "004",
+      "file": "04_APP_SCHEMA_SP_RESTOCK_PROC_DDL.sql",
+      "rollback_complete": true
+    },
+    {
+      "id": "005",
+      "file": "05_APP_SCHEMA_INVENTORY_ITEM_DML.sql",
+      "rollback_complete": true
+    }
+  ],
+  "findings": [
+    {
+      "severity": "HIGH",
+      "code": "TYPE_NARROW",
+      "message": "inventory_item.sku: VARCHAR(40) -> VARCHAR(30) reduces length/precision - fails or truncates if existing data exceeds the new size.",
+      "recommendation": "Run the max-length pre-check below.",
+      "category": "risk",
+      "location": "samples/mysql/release.sql:12"
+    },
+    {
+      "severity": "HIGH",
+      "code": "MYSQL_MODIFY_RESETS",
+      "message": "MySQL MODIFY/CHANGE replaces the whole column definition - DEFAULT, NOT NULL, COMMENT and charset not restated are lost.",
+      "recommendation": "Restate the full column definition.",
+      "category": "risk",
+      "location": "samples/mysql/release.sql:12"
+    },
+    {
+      "severity": "MEDIUM",
+      "code": "UNNAMED_CONSTRAINT",
+      "message": "Unnamed PRIMARY KEY on inventory_item - database generates a different SYS_ name in every environment (rollback/diff cannot reference it).",
+      "recommendation": "Name every constraint explicitly.",
+      "category": "naming",
+      "location": "samples/mysql/release.sql:1"
+    },
+    {
+      "severity": "INFO",
+      "code": "SPLIT_DDL_DML",
+      "message": "samples/mysql/release.sql mixes DDL and DML - the agent emitted them as separate changeSets.",
+      "recommendation": "",
+      "category": "best_practice",
+      "location": ""
+    }
+  ]
+}

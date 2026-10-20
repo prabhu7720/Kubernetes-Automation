@@ -1,0 +1,261 @@
+--liquibase formatted sql
+
+--changeset SOL_DATA:RB.SOL_SERVICES.1.34.1.0.1-pre
+
+Insert Into LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER (CHANGESET_ID,SCHEMA_NAME,SCRIPT_NAME,RELEASE_NUMBER,OBJECT_TYPE,OBJECT_NAME,SQL_LOCATION,ACTION,STATUS,COUNT_BEFORE_CHANGE,COUNT_AFTER_CHANGE,ROLLBACK_FLAG) VALUES ('RB.SOL_SERVICES.1.34.1.0.1','BILLING_EVENT','91_VIBEHUB_BILLING_EVENT_1_34_ROLLBACK.sql','SOL_SERVICES 1.34','Multiple','Release 1.34 rollback','/opt/scripts/','Rollback','PENDING',(select count (*) from DBA_OBJECTS where OWNER = 'BILLING_EVENT'),0,1);
+COMMIT;
+--rollback DELETE FROM LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER WHERE CHANGESET_ID = 'RB.SOL_SERVICES.1.34.1.0.1';
+
+--changeset SOL_DATA:RB.SOL_SERVICES.1.34.1.0.1 endDelimiter:"/"
+--comment: Rollback of release 1.34 (reverse order of deploy scripts)
+
+-- =====================================================
+-- 1) Reverse 18_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.18)
+-- Superseded: object(s) TRG_SHADOW_PRODUCT_ORDER_AUDIT are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 2) Reverse 17_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.17)
+-- Superseded: object(s) TRG_SHADOW_ORDER_AUDIT are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 3) Reverse 16_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_DROP_COLUMNS_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.16)
+-- Superseded: object(s) SHADOW_PRODUCT_ORDER_AUDIT are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 4) Reverse 15_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_DROP_COLUMNS_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.15)
+-- Superseded: object(s) SHADOW_ORDER_AUDIT are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 5) Reverse 14_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_DROP_COLUMNS_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.14)
+-- Superseded: object(s) SHADOW_PRODUCT_ORDER are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 6) Reverse 13_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DROP_COLUMNS_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.13)
+-- Superseded: object(s) SHADOW_ORDER are created in this release and dropped later in this script.
+-- =====================================================
+
+-- =====================================================
+-- 7) Reverse 12_VIBEHUB_BILLING_EVENT_ACCOUNT_EVENT_VW_DDL.sql (SOL_SERVICES.1.34.1.0.12)
+-- NOTE: Restores the previous definition of BILLING_EVENT.ACCOUNT_EVENT_VW captured from baseline/earlier step.
+-- =====================================================
+CREATE OR REPLACE FORCE EDITIONABLE VIEW "BILLING_EVENT"."ACCOUNT_EVENT_VW" ("ACCOUNT_ID", "SITE_ID", "ACCOUNT_NUMBER", "TWELVE_DIGIT_NUMBER", "THIRTEEN_DIGIT_NUMBER", "SIXTEEN_DIGIT_NUMBER", "COMPANY", "DIVISION", "FRANCHISE_NUMBER", "FIRST_NAME", "LAST_NAME", "BUSINESS_NAME", "BILLING_STATUS", "ACCOUNT_STATUS", "SECURITY_CODE", "BILL_TYPE", "DELINQUENCY_STATUS", "BIRTH_DATE", "TAX_TYPE", "TAX_IDENTIFIER", "DRIVERS_LICENSE_NUM", "PERSISTENT_ID", "CONTROLLER_ID", "VCM", "INSTALL_DATE", "DISCONNECTED_DATE", "CUSTOMER_CATEGORY", "CUSTOMER_TYPE", "SERVICE_ADDR_LINE1", "SERVICE_ADDR_LINE2", "SERVICE_CITY", "SERVICE_STATE", "SERVICE_ZIP5", "SERVICE_ZIP4", "NODE_NUMBER", "HOUSE_NUMBER", "HOUSE_DEVELOPMENT_NUMBER", "BILLTO_ADDR_LINE1", "BILLTO_ADDR_LINE2", "BILLTO_CITY", "BILLTO_STATE", "BILLTO_ZIP5", "BILLTO_ZIP4", "BILLTO_CUSTOMER_NAME", "BILLTO_BUSINESS_NAME", "ACCOUNT_CONTACT_ID", "NOTIFICATION_METHOD", "CONTACT_TYPE", "CONTACT_VALUE", "PRIMARY_CONTACT", "OPT_IN_FLAG", "ACCOUNT_PROD_CATEGORY_ID", "PROD_CATEGORY_CODE", "CUST_PROD_CAT_STATUS", "CUST_PROD_CAT_STATUS_DATE", "FROM_ACCOUNT_ID", "TRANSFER_STATUS", "SEASONAL_SUSPEND_START", "SEASONAL_SUSPEND_END", "AUTH_USER", "MASTER_ACCOUNT", "TRANSACTION_ID", "EVENT_TIMESTAMP", "EVENT_ID", "CORRELATION_ID", "ORIGIN", "SYNC_STATUS", "ERR_MSG", "ACCOUNT_CREATED_DT", "ACCOUNT_CREATED_BY", "ACCOUNT_UPDATED_DT", "ACCOUNT_UPDATED_BY") AS
+  SELECT
+    a.ACCOUNT_ID,
+    a.SITE_ID,
+    a.ACCOUNT_NUMBER,
+    LPAD(a.SITE_ID, 3, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS TWELVE_DIGIT_NUMBER,
+    LPAD(a.COMPANY, 2, '0') || LPAD(a.DIVISION, 2, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS THIRTEEN_DIGIT_NUMBER,
+    LPAD(a.SITE_ID, 3, '0') || LPAD(a.COMPANY, 2, '0') || LPAD(a.DIVISION, 2, '0') || LPAD(a.ACCOUNT_NUMBER, 9, '0') AS SIXTEEN_DIGIT_NUMBER,
+    a.COMPANY,
+    a.DIVISION,
+    a.FRANCHISE_NUMBER,
+    a.FIRST_NAME,
+    a.LAST_NAME,
+    a.BUSINESS_NAME,
+    a.BILLING_STATUS,
+    a.ACCOUNT_STATUS,
+    a.SECURITY_CODE,
+    a.BILL_TYPE,
+    a.DELINQUENCY_STATUS,
+    a.BIRTH_DATE,
+    a.TAX_TYPE,
+    a.TAX_IDENTIFIER,
+    a.DRIVERS_LICENSE_NUM,
+    a.PERSISTENT_ID,
+    a.CONTROLLER_ID,
+    a.VCM,
+    a.INSTALL_DATE,
+    a.DISCONNECTED_DATE,
+    a.CUSTOMER_CATEGORY,
+    a.CUSTOMER_TYPE,
+    aa.ADDR_LINE1 AS SERVICE_ADDR_LINE1,
+    aa.ADDR_LINE2 AS SERVICE_ADDR_LINE2,
+    aa.CITY AS SERVICE_CITY,
+    aa.STATE AS SERVICE_STATE,
+    aa.ZIP5 AS SERVICE_ZIP5,
+    aa.ZIP4 AS SERVICE_ZIP4,
+    aa.NODE_NUMBER,
+    aa.HOUSE_NUMBER,
+    aa.HOUSE_DEVELOPMENT_NUMBER,
+    bta.BILLTO_ADDR_LINE1 AS BILLTO_ADDR_LINE1,
+    bta.BILLTO_ADDR_LINE2 AS BILLTO_ADDR_LINE2,
+    bta.BILLTO_CITY AS BILLTO_CITY,
+    bta.BILLTO_STATE AS BILLTO_STATE,
+    bta.BILLTO_ZIP5 AS BILLTO_ZIP5,
+    bta.BILLTO_ZIP4 AS BILLTO_ZIP4,
+    bta.BILLTO_FIRST_NAME || ' ' || bta.BILLTO_LAST_NAME AS BILLTO_CUSTOMER_NAME,
+    bta.BILLTO_BUSINESS_NAME AS BILLTO_BUSINESS_NAME,
+    ac.ACCOUNT_CONTACT_ID,
+    ac.NOTIFICATION_METHOD,
+    ac.CONTACT_TYPE,
+    ac.CONTACT_VALUE,
+    ac.PRIMARY AS PRIMARY_CONTACT,
+    ac.OPT_IN_FLAG,
+    apc.ACCOUNT_PROD_CATEGORY_ID,
+    apc.PROD_CATEGORY_CODE,
+    apc.CUST_PROD_CAT_STATUS,
+    apc.CUST_PROD_CAT_STATUS_DATE,
+    at.FROM_ACCOUNT_ID,
+    at.TRANSFER_STATUS,
+    asr.SEASONAL_SUSPEND_START,
+    asr.SEASONAL_SUSPEND_END,
+    aau.AUTH_USER,
+    ma.MASTER_ACCOUNT_ID,
+    aet.TRANSACTION_ID,
+    aet.EVENT_TIMESTAMP,
+    aet.EVENT_ID,
+    aet.CORRELATION_ID,
+    aet.ORIGIN,
+    aet.SYNC_STATUS,
+    aet.ERR_MSG,
+    a.CREATED_DT AS ACCOUNT_CREATED_DT,
+    a.CREATED_BY AS ACCOUNT_CREATED_BY,
+    a.UPDATED_DT AS ACCOUNT_UPDATED_DT,
+    a.UPDATED_BY AS ACCOUNT_UPDATED_BY
+
+FROM
+    BILLING_EVENT.ACCOUNT a
+    INNER JOIN BILLING_EVENT.HOUSE_ADDRESS aa
+        ON a.HOUSE_ADDR_ID = aa.HOUSE_ADDR_ID
+    LEFT JOIN BILLING_EVENT.BILLTO_ADDRESS bta
+        ON a.ACCOUNT_ID = bta.ACCOUNT_ID
+    LEFT JOIN BILLING_EVENT.ACCOUNT_CONTACT ac
+        ON a.ACCOUNT_ID = ac.ACCOUNT_ID
+    LEFT JOIN BILLING_EVENT.ACCOUNT_PROD_CATEGORY apc
+        ON a.ACCOUNT_ID = apc.ACCOUNT_ID
+    LEFT JOIN BILLING_EVENT.ACCOUNT_TRANSFER at
+        ON a.ACCOUNT_ID = at.ACCOUNT_ID
+    LEFT JOIN BILLING_EVENT.SEASONAL_ACCOUNT asr
+        ON a.ACCOUNT_ID = asr.ACCOUNT_ID
+    LEFT JOIN (
+        SELECT ACCOUNT_ID, TRANSACTION_ID, EVENT_TIMESTAMP, EVENT_ID,
+               CORRELATION_ID, ORIGIN, SYNC_STATUS, ERR_MSG
+        FROM (
+            SELECT aevt.ACCOUNT_ID, aevt.TRANSACTION_ID, aevt.EVENT_TIMESTAMP, aevt.EVENT_ID,
+                   aevt.CORRELATION_ID, aevt.ORIGIN, aevt.SYNC_STATUS, aevt.ERR_MSG,
+                   ROW_NUMBER() OVER (PARTITION BY aevt.ACCOUNT_ID
+                                      ORDER BY aevt.EVENT_TIMESTAMP DESC) AS rn
+            FROM BILLING_EVENT.ACCOUNT_EVENT_TRANSACTION aevt
+            WHERE aevt."RESOURCE" = 'account'
+        )
+        WHERE rn = 1
+    ) aet
+        ON a.ACCOUNT_ID = aet.ACCOUNT_ID
+   LEFT JOIN BILLING_EVENT.MASTER_ACCOUNT ma
+        ON a.ACCOUNT_ID = ma.ACCOUNT_ID
+    LEFT JOIN BILLING_EVENT.ACCOUNT_AUTH_USER aau
+        ON a.ACCOUNT_ID = aau.ACCOUNT_ID
+/
+COMMENT ON TABLE BILLING_EVENT.ACCOUNT_EVENT_VW IS 'Account event view with all related details. Returns multiple rows per account for contacts and product categories.'
+/
+
+-- =====================================================
+-- 8) Reverse 11_VIBEHUB_BILLING_EVENT_FK_INDEXES_DDL.sql (SOL_SERVICES.1.34.1.0.11)
+-- =====================================================
+DROP INDEX BILLING_EVENT.IDX_SEASONAL_ACCT_ACCOUNT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_MASTER_ACCT_MASTER_ID
+/
+DROP INDEX BILLING_EVENT.IDX_BILLTO_ADDR_ACCOUNT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PHONE_PROD_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PHONE_ACCT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCT_PROD_PRODUCT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCT_DISC_PRODUCT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCT_DISC_DISCOUNT_ID
+/
+DROP INDEX BILLING_EVENT.IDX_ACCOUNT_HOUSE_ADDR_ID
+/
+
+-- =====================================================
+-- 9) Reverse 10_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_DML.sql (SOL_SERVICES.1.34.1.0.10)
+-- NOTE: Pre-update values restored from ACCOUNT_TRANSFER_BKP53 by primary key.
+-- =====================================================
+MERGE INTO BILLING_EVENT.ACCOUNT_TRANSFER t USING BILLING_EVENT.ACCOUNT_TRANSFER_BKP53 b ON (t.ACCOUNT_TRANSFER_ID = b.ACCOUNT_TRANSFER_ID) WHEN MATCHED THEN UPDATE SET t.TO_ACCOUNT_ID = b.TO_ACCOUNT_ID
+/
+
+-- =====================================================
+-- 10) Reverse 09_VIBEHUB_BILLING_EVENT_ACCOUNT_TRANSFER_ALTER_DDL.sql (SOL_SERVICES.1.34.1.0.9)
+-- NOTE: Re-applying NOT NULL on FROM_ACCOUNT_ID fails if NULL rows were written after deploy: UPDATE/DELETE them first.
+-- NOTE: Re-adding FK FK_ACCT_TRANSFER_FROM_ACCT fails if orphan rows were created meanwhile - delete/repair them first.
+-- =====================================================
+ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER DROP COLUMN TO_ACCOUNT_ID
+/
+ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER MODIFY (FROM_ACCOUNT_ID NOT NULL)
+/
+ALTER TABLE BILLING_EVENT.ACCOUNT_TRANSFER ADD CONSTRAINT FK_ACCT_TRANSFER_FROM_ACCT FOREIGN KEY (FROM_ACCOUNT_ID) REFERENCES BILLING_EVENT.ACCOUNT (ACCOUNT_ID)
+/
+
+-- =====================================================
+-- 11) Reverse 08_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_TRIG_DDL.sql (SOL_SERVICES.1.34.1.0.8)
+-- =====================================================
+DROP TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_AUDIT
+/
+
+-- =====================================================
+-- 12) Reverse 07_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_TRIG_DDL.sql (SOL_SERVICES.1.34.1.0.7)
+-- =====================================================
+DROP TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_AUDIT
+/
+
+-- =====================================================
+-- 13) Reverse 06_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_AUDIT_DDL.sql (SOL_SERVICES.1.34.1.0.6)
+-- =====================================================
+DROP TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER_AUDIT CASCADE CONSTRAINTS
+/
+DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_PROD_ORDER_AUD_ID
+/
+
+-- =====================================================
+-- 14) Reverse 05_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_AUDIT_DDL.sql (SOL_SERVICES.1.34.1.0.5)
+-- =====================================================
+DROP TABLE BILLING_EVENT.SHADOW_ORDER_AUDIT CASCADE CONSTRAINTS
+/
+DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_ORDER_AUDIT_ID
+/
+
+-- =====================================================
+-- 15) Reverse 04_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_BEFORE_TRIG_DDL.sql (SOL_SERVICES.1.34.1.0.4)
+-- =====================================================
+DROP TRIGGER BILLING_EVENT.TRG_SHADOW_PRODUCT_ORDER_BEFORE
+/
+
+-- =====================================================
+-- 16) Reverse 03_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_BEFORE_TRIG_DDL.sql (SOL_SERVICES.1.34.1.0.3)
+-- =====================================================
+DROP TRIGGER BILLING_EVENT.TRG_SHADOW_ORDER_BEFORE
+/
+
+-- =====================================================
+-- 17) Reverse 02_VIBEHUB_BILLING_EVENT_SHADOW_PRODUCT_ORDER_DDL.sql (SOL_SERVICES.1.34.1.0.2)
+-- =====================================================
+DROP TABLE BILLING_EVENT.SHADOW_PRODUCT_ORDER CASCADE CONSTRAINTS
+/
+DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_PRODUCT_ORDER_ID
+/
+
+-- =====================================================
+-- 18) Reverse 01_VIBEHUB_BILLING_EVENT_SHADOW_ORDER_DDL.sql (SOL_SERVICES.1.34.1.0.1)
+-- =====================================================
+DROP TABLE BILLING_EVENT.SHADOW_ORDER CASCADE CONSTRAINTS
+/
+DROP SEQUENCE BILLING_EVENT.SEQ_SHADOW_ORDER_ID
+/
+
+-- Forward-only rollback script: to undo it, re-run the release deploy scripts.
+--rollback SELECT 1 FROM DUAL;
+
+--changeset SOL_DATA:RB.SOL_SERVICES.1.34.1.0.1-post
+
+UPDATE LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER SET COUNT_AFTER_CHANGE = (select count (*) from DBA_OBJECTS where OWNER = 'BILLING_EVENT'), STATUS = 'COMPLETED' WHERE CHANGESET_ID = 'RB.SOL_SERVICES.1.34.1.0.1';
+COMMIT;
+--rollback UPDATE LIQUIBASE_APP.LIQUIBASE_DB_CHANGE_TRACKER SET STATUS = 'ROLLED_BACK', ROLLBACK_FLAG = 1 WHERE CHANGESET_ID = 'RB.SOL_SERVICES.1.34.1.0.1';

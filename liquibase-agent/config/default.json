@@ -1,0 +1,127 @@
+{
+  "_comment": "Base profile. Every key can be overridden by a profile in config/profiles/*.json (deep merge) or CLI flags.",
+  "dialect": "",
+  "author": "agent",
+  "project": "PROJECT",
+  "app": "APP",
+  "release": "1.0",
+  "default_schema": "",
+  "start_seq": 1,
+
+  "changeset_id_pattern": "{seq:03d}",
+  "rollback_id_prefix": "RB.",
+  "tag_before_release": true,
+  "tag_changeset_id_pattern": "{release}-tag",
+  "tag_pattern": "{project}_{release}_pre",
+  "labels_pattern": "{release}",
+  "context": "",
+  "xsd_version": "4.20",
+  "xml_file_pattern": "db.changelog-{release}.xml",
+  "xml_schema_attr": true,
+  "xml_dbms_attr": false,
+  "xml_changelog_dbms_precondition": true,
+  "changelog_properties": {},
+  "run_on_change_for_replaceable": false,
+
+  "preconditions": true,
+  "precondition_on_fail": "MARK_RAN",
+  "precondition_on_error": "HALT",
+
+  "sql_group_by": "object",
+  "file_name_pattern": "{seq:02d}_{app}_{schema}_{object}_{suffix}.sql",
+  "file_number_offset": 0,
+  "rollback_file_pattern": "{rb_seq}_{app}_{schema}_{release_tag}_ROLLBACK.sql",
+  "deploy_dir_pattern": "{app_lower}_{release}_deploy",
+  "rollback_dir_pattern": "{app_lower}_{release}_Rollback",
+  "plsql_changeset_attrs": " splitStatements:false",
+  "inline_rollback": true,
+  "rollback_script": true,
+  "keep_source_comments": true,
+  "allow_grouped_ddl": true,
+
+  "dml_backup": true,
+  "backup_suffix": "_BKP",
+  "oracle_drop_cascade": true,
+  "oracle_dictionary_prefix": "ALL",
+  "warn_hardcoded_sequence_start": true,
+
+  "tracker": {
+    "enabled": false,
+    "table": "",
+    "release_label": "{project} {release}",
+    "sql_location": "/opt/scripts/",
+    "rollback_lines": true,
+    "index_batch_label": "Supporting Indexes",
+    "unit_types": {
+      "TABLE":    {"object_type": "Table", "object_type_with_index": "Table/Index", "action": "Create Table", "count": "tables"},
+      "ALTER":    {"object_type": "Table", "action": "Alter", "count": "columns"},
+      "INDEX":    {"object_type": "Index", "action": "Create Index", "count": "indexes"},
+      "VIEW":     {"object_type": "VIEW", "action": "Create or Replace View", "count": "views"},
+      "TRIGGER":  {"object_type": "TRIGGER", "action": "Create or Replace Trigger", "count": "triggers"},
+      "ROUTINE":  {"object_type": "PROCEDURE", "action": "Create or Replace Procedure", "count": "objects"},
+      "SEQUENCE": {"object_type": "SEQUENCE", "action": "Create Sequence", "count": "sequences"},
+      "DML":      {"object_type": "Data", "action": "Data Migration", "count": "rows"},
+      "DROP":     {"object_type": "Multiple", "action": "Drop", "count": "objects"},
+      "GRANT":    {"object_type": "Grant", "action": "Grant", "count": "objects"},
+      "COMMENT":  {"object_type": "Comment", "action": "Comment", "count": "objects"},
+      "OTHER":    {"object_type": "Other", "action": "Other", "count": "objects"}
+    },
+    "count_queries": {
+      "tables":    "select count (*) from DBA_TABLES where OWNER = '{schema}'",
+      "columns":   "select count (*) from DBA_TAB_COLUMNS where OWNER = '{schema}' and TABLE_NAME {table_pred}",
+      "indexes":   "select count (*) from DBA_INDEXES where OWNER = '{schema}'",
+      "views":     "select count (*) from DBA_VIEWS where OWNER = '{schema}'",
+      "triggers":  "select count (*) from DBA_TRIGGERS where OWNER = '{schema}'",
+      "sequences": "select count (*) from DBA_SEQUENCES where SEQUENCE_OWNER = '{schema}'",
+      "rows":      "select count (*) from {schema}.{table}",
+      "objects":   "select count (*) from DBA_OBJECTS where OWNER = '{schema}'",
+      "rollback":  "select count (*) from DBA_OBJECTS where OWNER = '{schema}'"
+    }
+  },
+
+  "grants": {
+    "auto_generate": false,
+    "readonly_table_regex": "_AUDIT$|_HIST$|_LOG$",
+    "table":    [],
+    "view":     [],
+    "sequence": [],
+    "routine":  []
+  },
+  "grant_sql_pattern": "GRANT {privileges} ON {schema}.{object} TO {grantee}",
+
+  "tablespace": {"enforce": false, "default_data": "{schema}_DATA"},
+  "required_columns": [],
+  "required_columns_exempt_regex": "_AUDIT$|_HIST$|_LOG$|_BKP\\d*$",
+
+  "naming": {
+    "enabled": true,
+    "uppercase": true,
+    "severity": "LOW",
+    "max_identifier_length": null,
+    "object_regex": "^[A-Z][A-Z0-9_$#]*$",
+    "author_regex": "^[A-Za-z][A-Za-z0-9_.\\-]{1,63}$",
+    "changeset_id_regex": "",
+    "prefixes": {
+      "table": "",
+      "primary_key": "^PK_",
+      "foreign_key": "^FK_",
+      "unique": "^(UK|UQ)_",
+      "check": "^(CHK|CK)_",
+      "index": "^(IDX|IX)_",
+      "unique_index": "^(UK|UX|UQ|IDX)_",
+      "sequence": "^(SEQ|SQ)_",
+      "trigger": "^(TRG|TR)_",
+      "view": "(_VW|_V)$",
+      "materialized_view": "(_MV)$",
+      "procedure": "",
+      "function": "",
+      "package": ""
+    }
+  },
+
+  "best_practices": {
+    "allow_hardcoded_schema": false,
+    "allow_hardcoded_tablespace": false
+  },
+  "deployment_notes_extra": []
+}

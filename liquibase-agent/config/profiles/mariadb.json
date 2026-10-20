@@ -1,0 +1,10 @@
+{
+  "_comment": "Generic MariaDB 10.6+ profile.",
+  "dialect": "mariadb",
+  "oracle_drop_cascade": false,
+  "naming": {
+    "max_identifier_length": 64,
+    "uppercase": false,
+    "object_regex": "^[a-z][a-z0-9_]*$"
+  }
+}

@@ -1,0 +1,38 @@
+<!-- @template add_column -->
+<addColumn${attrs}>
+${columns}
+</addColumn>
+<!-- @template drop_column -->
+<dropColumn${attrs}>
+${columns}
+</dropColumn>
+<!-- @template modify_data_type -->
+<modifyDataType${attrs}/>
+<!-- @template add_not_null -->
+<addNotNullConstraint${attrs}/>
+<!-- @template drop_not_null -->
+<dropNotNullConstraint${attrs}/>
+<!-- @template add_default -->
+<addDefaultValue${attrs}/>
+<!-- @template drop_default -->
+<dropDefaultValue${attrs}/>
+<!-- @template rename_column -->
+<renameColumn${attrs}/>
+<!-- @template rename_table -->
+<renameTable${attrs}/>
+<!-- @template add_foreign_key -->
+<addForeignKeyConstraint${attrs}/>
+<!-- @template add_primary_key -->
+<addPrimaryKey${attrs}/>
+<!-- @template add_unique -->
+<addUniqueConstraint${attrs}/>
+<!-- @template drop_foreign_key -->
+<dropForeignKeyConstraint${attrs}/>
+<!-- @template drop_primary_key -->
+<dropPrimaryKey${attrs}/>
+<!-- @template drop_unique -->
+<dropUniqueConstraint${attrs}/>
+<!-- @template set_table_remarks -->
+<setTableRemarks${attrs}/>
+<!-- @template set_column_remarks -->
+<setColumnRemarks${attrs}/>
